@@ -1,0 +1,22 @@
+version: '3'
+services:
+  web:
+    image: nginx:latest
+    volumes:
+      - ./html:/usr/share/nginx/html/:ro
+      - ./nginx:/etc/nginx/templates/:rw
+      - ./certbot/conf:/etc/letsencrypt/:ro
+    environment:
+      - HOST_NAME=${HOST_NAME}
+      - REMOTE_ARCHIVES_SERVER=${REMOTE_ARCHIVES_SERVER} 
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+  certbot:
+    image: certbot/certbot:latest
+    environment:
+      - HOST_NAME=${HOST_NAME}
+    volumes:
+      - ./html:/usr/share/nginx/html/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw

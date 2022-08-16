@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>WARC.GZ / WACZ HTML Embed</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" value="noindex, nofollow"/>
+
+    <style>
+    * {
+      box-sizing: border-box;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+    </style>
+    
+    <script defer src="/replay-web-page/ui.js"></script>
+    <script type="module">
+    //
+    // Don't start playback unless we're in a cross origin <iframe>
+    //
+    let isInIframe = true;
+    let isCrossOrigin = true;
+    let isLocalhost = window.location.host.startsWith("localhost:");
+
+    try {
+      if (parent.window.location === window.location) {
+        isInIframe = false;
+      }
+
+      if (parent.window.location.host === window.location.host) {
+        isCrossOrigin = false;
+      }
+    }
+    catch(err) { // If we don't have access to `parent.window.x`, we're likely ok.
+      isInIframe = true;
+      isCrossOrigin = true;
+    }
+
+    if (!isLocalhost && (!isInIframe || !isCrossOrigin)) {
+      throw new Error("This page should be embedded in a cross origin iframe.");
+    }
+
+    //
+    // Grab playback info from search params
+    //
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get("archive-file") === null || params.get("archived-url") === null) {
+      throw new Error("`archive-file` and `archived-url` search params must be provided.");
+    }
+
+    //
+    // Inject `<replay-web-page>`
+    //
+    const replay = document.createElement("replay-web-page");
+    replay.setAttribute("source", `/${params.get("archive-file")}`);
+    replay.setAttribute("url", `${params.get("archived-url")}`);
+    replay.setAttribute("replayBase", "/replay-web-page/");
+    replay.setAttribute("noCache", "");
+
+    // Option: &show-location-bar: overrides embed mode to show the location bar.
+    if (params.get("show-location-bar")) {
+      replay.setAttribute("embed", "default");
+    }
+    else {
+      replay.setAttribute("embed", "replayonly");
+    }
+
+    // `noWebWorker` for Safari < 16
+    if (window.GestureEvent !== undefined && window.SharedWorker === undefined){
+      replay.setAttribute("noWebWorker", "");
+    }
+
+    document.querySelector("body").appendChild(replay);
+    </script>
+  </head>
+
+  <body>
+  </body>
+
+</html>

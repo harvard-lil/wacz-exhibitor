@@ -1,0 +1,3 @@
+*.warc.gz
+*.wacz
+.env

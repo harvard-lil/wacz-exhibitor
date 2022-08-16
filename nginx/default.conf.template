@@ -1,0 +1,99 @@
+#
+# Default configuration file for warc-embed.
+# 
+# Inspiration:
+# - https://www.nginx.com/blog/smart-efficient-byte-range-caching-nginx/
+# - https://kevincox.ca/2021/06/04/http-range-caching/
+# - https://github.com/KyleAMathews/docker-nginx/blob/master/nginx.conf
+#
+proxy_cache_path /var/cache/nginx keys_zone=rangecache:10m;
+
+server { 
+  server_name ${HOST_NAME};
+  server_tokens off;
+
+  listen 80;
+  listen [::]:80;
+
+  # This section will be uncommented by `make-and-use-cert.sh`
+  ### listen 443 ssl http2;
+  ### listen [::]:443 ssl http2;
+
+  ### ssl_certificate /etc/letsencrypt/live/${HOST_NAME}/fullchain.pem;
+  ### ssl_certificate_key /etc/letsencrypt/live/${HOST_NAME}/privkey.pem;
+
+  root /usr/share/nginx/html/;
+
+  # Range request caching setup
+  slice              1m;
+  proxy_cache_key    $host$uri$is_args$args$slice_range;
+  proxy_set_header   Range $slice_range;
+  proxy_http_version 1.1;
+  proxy_cache_valid  200 206 1h;
+  proxy_cache rangecache;
+
+  # Gzip compression setup
+  gzip on;
+  gzip_http_version 1.0; # Minimum HTTP version for gzip compression
+  gzip_comp_level 5;
+  gzip_min_length 256;
+  gzip_proxied any;
+  gzip_vary on;
+  gzip_types
+    application/javascript
+    application/json
+    text/css
+    text/plain;
+  # text/html is always compressed by HttpGzipModule
+
+  # Certbot challenge route
+  location /.well-known/acme-challenge/ {
+    root /usr/share/nginx/html/certbot/;
+  }
+  
+  # Serves contents of "/embed" as "/"
+  location / {
+    try_files /embed$uri /embed/$uri/ /index.html;
+  }
+
+  # Exception to the above rule: "/replay-web-page" folder.
+  location /replay-web-page/ {
+    try_files $uri $uri/;
+  }
+
+  #
+  # Access to "warc.gz" / "wacz" files:
+  # - Serve local file from "/archives/" if available.
+  # - Otherwise, try to proxy it from ${REMOTE_ARCHIVES_SERVER}
+  #
+  location ~ \.warc.gz {
+    gzip_static on;
+    types { } default_type "application/x-gzip";
+    try_files /archives/$uri /archives/$uri/ @remote_warc_gz_archive;
+  }
+
+  location ~ \.wacz {
+    types { } default_type "binary/octet-stream";
+    try_files /archives/$uri /archives/$uri/ @remote_wacz_archive;
+  }
+
+  location @remote_warc_gz_archive {
+    proxy_pass ${REMOTE_ARCHIVES_SERVER};
+    proxy_hide_header Content-Type;
+    add_header Content-Type "application/x-gzip";
+  }
+
+  location @remote_wacz_archive {
+    proxy_pass ${REMOTE_ARCHIVES_SERVER};
+    proxy_hide_header Content-Type;
+    add_header Content-Type "binary/octet-stream";
+  }
+
+}
+
+# Error / warning logs
+error_log /var/log/nginx/error.log warn;
+
+# Reverse proxy logs
+log_format upstreamlog '[$time_local] $remote_addr - $remote_user - $HOST_NAME to: $upstream_addr: $request upstream_response_time $upstream_response_time msec $msec request_time $request_time';
+access_log  /var/log/nginx/access.log upstreamlog;
