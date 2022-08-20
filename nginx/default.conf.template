@@ -24,7 +24,7 @@ server {
 
   root /usr/share/nginx/html/;
 
-  # Range request caching setup
+  # Range request caching setup (slice-by-slice approach)
   slice              1m;
   proxy_cache_key    $host$uri$is_args$args$slice_range;
   proxy_set_header   Range $slice_range;
