@@ -73,7 +73,7 @@ server {
   }
 
   location ~ \.wacz {
-    types { } default_type "binary/octet-stream";
+    types { } default_type "application/wacz";
     try_files /archives/$uri /archives/$uri/ @remote_wacz_archive;
   }
 
@@ -86,7 +86,7 @@ server {
   location @remote_wacz_archive {
     proxy_pass ${REMOTE_ARCHIVES_SERVER};
     proxy_hide_header Content-Type;
-    add_header Content-Type "binary/octet-stream";
+    add_header Content-Type "application/wacz";
   }
 
 }
