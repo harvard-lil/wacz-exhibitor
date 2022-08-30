@@ -6,7 +6,7 @@
 # - https://kevincox.ca/2021/06/04/http-range-caching/
 # - https://github.com/KyleAMathews/docker-nginx/blob/master/nginx.conf
 #
-proxy_cache_path /var/cache/nginx keys_zone=rangecache:10m;
+proxy_cache_path /var/cache/nginx keys_zone=rangecache:10m inactive=60m;
 
 server { 
   server_name ${HOST_NAME};
