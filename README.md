@@ -8,7 +8,7 @@ It also benefits from [NGINX's advanced range request caching features](https://
 
 > See also: [`warc-embed-netlify`](https://github.com/harvard-lil/warc-embed-netlify)
 
-🖼️ [Live Demo](https://warcembed-demo.matteocargnelutti.dev)
+🖼️ [Live Demo](https://warcembed-demo.lil.tools)
 
 ---
 
