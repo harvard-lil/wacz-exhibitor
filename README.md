@@ -1,5 +1,3 @@
-> ⚠️ Work in progress 
-
 # warc-embed 🏛️
 Experimental proxy and wrapper for safely embedding Web Archives (`.warc.gz`, `.wacz`) into web pages. 
 
