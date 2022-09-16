@@ -4,9 +4,9 @@ Experimental proxy and wrapper for safely embedding Web Archives (`.warc.gz`, `.
 This particular implementation, based on [NGINX](https://www.nginx.com/), consists in a [docker-compose setup](https://docs.docker.com/compose/) allowing for quick and easy deployment on a VPS.<br> 
 It also benefits from [NGINX's advanced range request caching features](https://www.nginx.com/blog/smart-efficient-byte-range-caching-nginx/). 
 
-> See also: [`warc-embed-netlify`](https://github.com/harvard-lil/warc-embed-netlify)
-
 🖼️ [Live Demo](https://warcembed-demo.lil.tools)
+
+📖 See also: [Blog post](https://lil.law.harvard.edu/blog/2022/09/15/opportunities-and-challenges-of-client-side-playback/ "Blog post on lil.law.harvard.edu - Web Archiving: Opportunities and Challenges of Client-Side Playback")
 
 ---
 
