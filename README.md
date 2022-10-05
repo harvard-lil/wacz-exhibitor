@@ -1,8 +1,9 @@
 # warc-embed 🏛️
-Experimental proxy and wrapper for safely embedding Web Archives (`.warc.gz`, `.wacz`) into web pages. 
+Experimental proxy and wrapper boilerplate for safely and efficiently embedding Web Archives (`.warc.gz`, `.wacz`) into web pages. 
 
-This particular implementation, based on [NGINX](https://www.nginx.com/), consists in a [docker-compose setup](https://docs.docker.com/compose/) allowing for quick and easy deployment on a VPS.<br> 
-It also benefits from [NGINX's advanced range request caching features](https://www.nginx.com/blog/smart-efficient-byte-range-caching-nginx/). 
+This particular implementation:
+- Wraps [Webrecorder's `<replay-web-page>`](https://replayweb.page/docs/embedding) client-side playback technology.
+- Serve, proxies and [cache](https://www.nginx.com/blog/smart-efficient-byte-range-caching-nginx/) web archive files using [NGINX](https://www.nginx.com/). Implementation consists in a [docker-compose setup](https://docs.docker.com/compose/), allowing for quick and easy deployment on a VPS.
 
 🖼️ [Live Demo](https://warcembed-demo.lil.tools)
 
@@ -14,7 +15,9 @@ It also benefits from [NGINX's advanced range request caching features](https://
 - [Concept](#concept)
 - [Environment Variables](#environment-variables)
 - [Routes](#routes)
+- [Communicating with the embedded archive](#communicating-with-the-embedded-archive)
 - [Deployment](#deployment)
+- [Changelog](/CHANGELOG.md)
 
 ---
 
@@ -36,7 +39,7 @@ The playback will only start when said document is embedded in a cross-origin `<
 ```html
 <!-- On https://*.domain.ext: -->
 <iframe
-  src="https://warcembed.domain.ext/?archive-file=archive.warc.gz&archived-url=https://what-was-archived.ext/path"
+  src="https://warcembed.domain.ext/?source=archive.warc.gz&url=https://what-was-archived.ext/path"
   allow="allow-scripts allow-modals allow-forms allow-same-origin"
 >
 </iframe>
@@ -55,11 +58,13 @@ These environment variables are used by `docker-compose` to replace values in `n
 | `HOST_NAME` | Yes | Host name of the deployed instance of `warc-embed`. Ex: `warcembed.example.com`. |
 | `REMOTE_ARCHIVES_SERVER` | Yes | Remote location to fetch archives from when not present locally. Ex: `https://warcserver.example.com` |
 
+[☝️ Back to summary](#summary)
+
 ---
 
 ## Routes
 
-### /?archive-file=X&archived-url=Y
+### /?source=X&url=Y
 
 #### Role
 Serves [an HTML document containing an instance of `<replay-web-page>`](/html/embed/index.html), pointing at a proxied archive file. 
@@ -76,21 +81,17 @@ www.example.com: Has iframes pointing at warcembed.example.com
 #### Query parameters
 | Name | Required ? | Description |
 | --- | --- | --- |
-| `archive-file` | Yes | Path + filename of the `.warc.gz` or `.wacz`. Can contain a path. <br>Must either be present in the [`/archives/` folder](/html/archives/) or on the remote server defined by [the `REMOTE_ARCHIVES_SERVER` environment variable](#environment-variables). |
-| `archived-url` | Yes | Url of the page that was archived. | 
-| `show-location-bar` | No | If set, will show `<replay-web-page>`'s address bar. <br>Particularly useful for multi-page archives.|
+| `source` | Yes | Path + filename of the `.warc.gz` or `.wacz`. Can contain a path. <br>Must either be present in the [`/archives/` folder](/html/archives/) or on the remote server defined by [the `REMOTE_ARCHIVES_SERVER` environment variable](#environment-variables). |
+| `url` | No | Url of a page within the archive to display. If not set, will try to open the first page available. | 
+| `ts`| No | Timestamp of the page to retrieve. Can be either a YYYYMMDDHHMMSS-formatted string or a millisecond timestamp or a. |
+| `embed` | No | `<replay-web-page>`'s [embed mode](https://replayweb.page/docs/embedding). Can be set to `replayonly` to hide its UI. |
+| `deepLink` | No | `<replay-web-page>`'s [`deepLink` mode](https://replayweb.page/docs/embedding). |
 
 #### Examples
 ```html
 <!-- On https://*.domain.ext: -->
 <iframe
-  src="https://warcembed.domain.ext/?archive-file=archive.warc.gz&archived-url=https://what-was-archived.ext/path"
-  allow="allow-scripts allow-modals allow-forms allow-same-origin"
->
-</iframe>
-
-<iframe
-  src="https://warcembed.domain.ext/?archive-file=/some/folder/archive.warc.gz&archived-url=https://what-was-archived.ext/path&show-location-bar=1"
+  src="https://warcembed.domain.ext/?source=archive.warc.gz&url=https://what-was-archived.ext/path"
   allow="allow-scripts allow-modals allow-forms allow-same-origin"
 >
 </iframe>
@@ -102,6 +103,66 @@ www.example.com: Has iframes pointing at warcembed.example.com
 Pulls, caches and serves a given `.warc.gz` or `.wacz` file, with full support for range requests.
 
 Will first look for the path + file given in the local [`/archives/` folder](/html/archives/), and try to proxy it from the remote server defined by [the `REMOTE_ARCHIVES_SERVER` environment variable](#environment-variables).
+
+[☝️ Back to summary](#summary)
+
+---
+
+## Communicating with the embedded archive
+
+`warc-embed` allows the embedding website to communicate with the embedded archive playback using [post messages](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage). 
+All messages coming _from_ a `warc-embed` `<iframe>` come with a `warcEmbedHref` property, helping identify the sender.  
+
+### Messages interpreted by the `warc-embed` `<iframe>`
+`warc-embed` will look for the following properties in messages coming from the embedding website and react accordingly:
+
+| Property name | Expected value | Description |
+| --- | --- | --- |
+| `updateUrl` | String | If provided, will replace the current `url` parameter of `<replay-web-page>`. |
+| `updateTs` | Number | If provided, will replace the current `ts` parameter of `<replay-web-page>`. |
+| `getCollInfo` | Boolean | If provided, will send a post message back with `<replay-web-page>`'s `collInfo` object, containing meta information about the currently-loaded archive. |
+| `getInited` | Boolean | If provided, will send a post message back with the current value of `<replay-web-page>`s `inited` property, indicating whether or not the service worker is ready. | 
+
+### Messages hoisted from `<replay-web-page>`
+`warc-embed` will forward to the embedding website every post message sent by `<replay-web-page>`'s service worker. 
+
+The most common example is the following, which is sent during navigation within an archive:
+
+```json
+{
+  "warcEmbedHref": "https://warcembed.domain.ext/?source=archive.warc.gz&url=https://what-was-archived.ext/path",
+  "url": "https://what-was-archived.ext/new-path/",
+  "view": "pages",
+  "ts": "20220816162527"
+}
+```
+
+### Example: Intercepting messages from a `warc-embed` `<iframe>`
+```javascript
+// Assuming: there's only 1 <iframe class="warc-embed">  
+const playback = document.querySelector("iframe.warc-embed");
+
+window.addEventListener("message", (e) => {
+  // This message bears data and comes from the `warc-embed` <iframe>
+  if (event?.data && event.source === playback.contentWindow) {
+    console.log(event);
+  }
+});
+```
+
+### Example: Sending a message to a `warc-embed` `<iframe>`
+```javascript
+// Assuming: there's only 1 <iframe class="warc-embed">  
+const playback = document.querySelector("iframe.warc-embed");
+const playbackOrigin = new URL(playback.src).origin;
+
+playback.contentWindow.postMessage(
+  {"setUrl": "https://lil.law.harvard.edu/projects"},
+  playbackOrigin
+);
+```
+
+[☝️ Back to summary](#summary)
 
 ---
 
@@ -122,3 +183,5 @@ The following quick start checklist will describe one of the many ways this setu
 
 **Note:** Although it doesn't contain any non-public / sensitive information, we encourage you to avoid keeping `.env` around in a production setting.<br>
 After initial setup, it may be safely discarded if replaced by actual environment variables.
+
+[☝️ Back to summary](#summary)
