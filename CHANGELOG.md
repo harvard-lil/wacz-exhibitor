@@ -1,3 +1,10 @@
+## v0.0.2 - Oct 11 2022
+- Moved from `docker-compose` to a single, more generic and hopefully universal `Dockerfile`.
+- Updated `README.md` accordingly
+- Upgraded to `<replay-web-page>` 1.7.1
+
+---
+
 ## v0.0.1 - Oct 5 2022 
 - Implemented two-way communication system using post messages (see readme).
 - Upgraded to `<replay-web-page>` 1.7.0

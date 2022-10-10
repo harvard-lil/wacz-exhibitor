@@ -1,3 +1,4 @@
 *.warc.gz
 *.wacz
-.env
+fly.toml
+.DS_Store
