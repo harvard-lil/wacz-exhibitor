@@ -1,9 +1,10 @@
 # warc-embed 🏛️
 Experimental proxy and wrapper boilerplate for safely and efficiently embedding Web Archives (`.warc.gz`, `.wacz`) into web pages. 
 
-This particular implementation:
+This implementation:
 - Wraps [Webrecorder's `<replay-web-page>`](https://replayweb.page/docs/embedding) client-side playback technology.
-- Serve, proxies and [cache](https://www.nginx.com/blog/smart-efficient-byte-range-caching-nginx/) web archive files using [NGINX](https://www.nginx.com/). Implementation consists in a [docker-compose setup](https://docs.docker.com/compose/), allowing for quick and easy deployment on a VPS.
+- Serves, proxies and [caches](https://www.nginx.com/blog/smart-efficient-byte-range-caching-nginx/) web archive files using [NGINX](https://www.nginx.com/). 
+- Allows for two-way communication between the embedding website and the embedded archive using post messages.
 
 🖼️ [Live Demo](https://warcembed-demo.lil.tools)
 
@@ -13,10 +14,10 @@ This particular implementation:
 
 ## Summary
 - [Concept](#concept)
-- [Environment Variables](#environment-variables)
 - [Routes](#routes)
-- [Communicating with the embedded archive](#communicating-with-the-embedded-archive)
 - [Deployment](#deployment)
+- [Local development](#local-development)
+- [Communicating with the embedded archive](#communicating-with-the-embedded-archive)
 - [Changelog](/CHANGELOG.md)
 
 ---
@@ -33,30 +34,17 @@ The playback will only start when said document is embedded in a cross-origin `<
 
 **The requested archive can be sourced from either:**
 - The local [`/archives/` folder](/html/archives/). This is where the server will look first.
-- A remote location the server will proxy from, defined by the [`REMOTE_ARCHIVES_SERVER` environment variable](#environment-variables).
+- A remote location the server will proxy from, defined in `nginx.conf`.
 
 ### Example 
 ```html
 <!-- On https://*.domain.ext: -->
 <iframe
   src="https://warcembed.domain.ext/?source=archive.warc.gz&url=https://what-was-archived.ext/path"
-  allow="allow-scripts allow-modals allow-forms allow-same-origin"
+  allow="allow-scripts allow-forms allow-same-origin"
 >
 </iframe>
 ```
-
-[☝️ Back to summary](#summary)
-
----
-
-## Environment variables
-
-These environment variables are used by `docker-compose` to replace values in `nginx/default.conf.template`. 
-
-| Name | Required | Description |
-| --- | --- | --- |
-| `HOST_NAME` | Yes | Host name of the deployed instance of `warc-embed`. Ex: `warcembed.example.com`. |
-| `REMOTE_ARCHIVES_SERVER` | Yes | Remote location to fetch archives from when not present locally. Ex: `https://warcserver.example.com` |
 
 [☝️ Back to summary](#summary)
 
@@ -81,7 +69,7 @@ www.example.com: Has iframes pointing at warcembed.example.com
 #### Query parameters
 | Name | Required ? | Description |
 | --- | --- | --- |
-| `source` | Yes | Path + filename of the `.warc.gz` or `.wacz`. Can contain a path. <br>Must either be present in the [`/archives/` folder](/html/archives/) or on the remote server defined by [the `REMOTE_ARCHIVES_SERVER` environment variable](#environment-variables). |
+| `source` | Yes | Path + filename of the `.warc.gz` or `.wacz`. Can contain a path. <br>Must either be present in the [`/archives/` folder](/html/archives/) or on the remote server defined in `nginx.conf`. |
 | `url` | No | Url of a page within the archive to display. If not set, will try to open the first page available. | 
 | `ts`| No | Timestamp of the page to retrieve. Can be either a YYYYMMDDHHMMSS-formatted string or a millisecond timestamp or a. |
 | `embed` | No | `<replay-web-page>`'s [embed mode](https://replayweb.page/docs/embedding). Can be set to `replayonly` to hide its UI. |
@@ -92,7 +80,7 @@ www.example.com: Has iframes pointing at warcembed.example.com
 <!-- On https://*.domain.ext: -->
 <iframe
   src="https://warcembed.domain.ext/?source=archive.warc.gz&url=https://what-was-archived.ext/path"
-  allow="allow-scripts allow-modals allow-forms allow-same-origin"
+  allow="allow-scripts allow-forms allow-same-origin"
 >
 </iframe>
 ```
@@ -102,7 +90,35 @@ www.example.com: Has iframes pointing at warcembed.example.com
 ### Role
 Pulls, caches and serves a given `.warc.gz` or `.wacz` file, with full support for range requests.
 
-Will first look for the path + file given in the local [`/archives/` folder](/html/archives/), and try to proxy it from the remote server defined by [the `REMOTE_ARCHIVES_SERVER` environment variable](#environment-variables).
+Will first look for the path + file given in the local [`/archives/` folder](/html/archives/), and try to proxy it from the remote server defined in `nginx.conf`.
+
+[☝️ Back to summary](#summary)
+
+---
+
+## Deployment
+This project consists of a single `Dockerfile` derived from [the official NGINX Docker image](https://hub.docker.com/_/nginx), which can be deployed on any docker-compatible machine. 
+
+### Example
+The following example describes the process of deploying `warc-embed` on [fly.io](https://fly.io), a platform-as-a-service provider. 
+1. `nginx.conf` needs to be edited. See comments starting with `EDIT:` in the document for instructions.
+2. Install the [`flyctl`](https://fly.io/docs/hands-on/install-flyctl/) client and [sign-in](https://fly.io/docs/hands-on/sign-in/), if not already done.
+3. Initialize and deploy the project by running the `flyctl launch` command _(use `flyctl deploy` for subsequent deploys)_. 
+4. `warc-embed` is now live and visible on the [`fly.io` dashboard](https://fly.io/dashboard). 
+5. We highly recommend setting up a **custom domain and SSL certificate**. This can be done directly from the `fly.io` dashboard. Ideally, the target domain should be a subdomain of the website on which `warc-embed` iframes are going to be embedded: for example, `www.domain.ext` embedding an `<iframe>` from `warcembed.domain.ext`.
+
+[☝️ Back to summary](#summary)
+
+---
+
+## Local development
+
+### Example: Running `warc-embed` locally using docker
+```bash
+docker build . -t warc-embed-local
+docker run --rm -p 8080:8080 warc-embed-local
+# warc-embed is now accessible on http://localhost:8080
+```
 
 [☝️ Back to summary](#summary)
 
@@ -157,31 +173,9 @@ const playback = document.querySelector("iframe.warc-embed");
 const playbackOrigin = new URL(playback.src).origin;
 
 playback.contentWindow.postMessage(
-  {"setUrl": "https://lil.law.harvard.edu/projects"},
+  {"setUrl": "https://what-was-archived.ext/new-path"},
   playbackOrigin
 );
 ```
-
-[☝️ Back to summary](#summary)
-
----
-
-## Deployment
-The following quick start checklist will describe one of the many ways this setup could be deployed on a VPS.
-
-**Pre requisites:** 
-- A Linux VPS with support for `docker-compose`.
-- A DNS record for a subdomain pointing at your server, for example for `warcembed.example.com`.
-
-**Checklist:**
-1. Clone this repository.
-2. Make a temporary copy of `.env.example` and edit it: `cp .env.example .env && nano .env` _(See [environment variables](#environment-variables))_.
-3. Start the server: `bash first-start.sh`
-4. Run `bash make-cert-dry-run.sh` to make sure an [Let's Encrypt](https://letsencrypt.org/) can generate a certificate for your setup.
-5. If everything went right, run `bash make-and-use-cert.sh` to actually generate the certificate and alter NGINX's configuration.
-6. You're live! The certificate will need to be regenerated every three months: the `renew-certificate.sh` may help with that task. 
-
-**Note:** Although it doesn't contain any non-public / sensitive information, we encourage you to avoid keeping `.env` around in a production setting.<br>
-After initial setup, it may be safely discarded if replaced by actual environment variables.
 
 [☝️ Back to summary](#summary)
