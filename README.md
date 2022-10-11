@@ -97,7 +97,7 @@ Will first look for the path + file given in the local [`/archives/` folder](/ht
 ---
 
 ## Deployment
-This project consists in a single `Dockerfile` derived from [the official NGINX Docker image](https://hub.docker.com/_/nginx), which can be deployed on any docker-compatible machine. 
+This project consists of a single `Dockerfile` derived from [the official NGINX Docker image](https://hub.docker.com/_/nginx), which can be deployed on any docker-compatible machine. 
 
 ### Example
 The following example describes the process of deploying `warc-embed` on [fly.io](https://fly.io), a platform-as-a-service provider. 
