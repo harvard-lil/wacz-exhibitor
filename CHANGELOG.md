@@ -1,3 +1,6 @@
+## v0.0.3 - Dec 05 2022
+- Upgraded to `<replay-web-page>` 1.7.7 
+
 ## v0.0.2 - Oct 11 2022
 - Moved from `docker-compose` to a single, more generic and hopefully universal `Dockerfile`.
 - Updated `README.md` accordingly
