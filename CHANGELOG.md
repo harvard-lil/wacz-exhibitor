@@ -1,3 +1,6 @@
+## v0.0.3 - Dec 19 2022
+- Upgraded to `<replay-web-page>` 1.7.9 
+
 ## v0.0.3 - Dec 05 2022
 - Upgraded to `<replay-web-page>` 1.7.7 
 
