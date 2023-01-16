@@ -1,3 +1,7 @@
+## v0.0.5 - Jan 16 2023 
+- Upgraded to `<replay-web-page>` 1.7.11 
+- Added support for `.warc`
+
 ## v0.0.4 - Dec 19 2022
 - Upgraded to `<replay-web-page>` 1.7.9 
 

@@ -1,3 +1,4 @@
+*.warc
 *.warc.gz
 *.wacz
 fly.toml

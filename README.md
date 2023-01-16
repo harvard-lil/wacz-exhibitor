@@ -1,5 +1,5 @@
 # warc-embed 🏛️
-Experimental proxy and wrapper boilerplate for safely and efficiently embedding Web Archives (`.warc.gz`, `.wacz`) into web pages. 
+Experimental proxy and wrapper boilerplate for safely and efficiently embedding Web Archives (`.warc`, `.warc.gz`, `.wacz`) into web pages. 
 
 This implementation:
 - Wraps [Webrecorder's `<replay-web-page>`](https://replayweb.page/docs/embedding) client-side playback technology.
@@ -69,7 +69,7 @@ www.example.com: Has iframes pointing at warcembed.example.com
 #### Query parameters
 | Name | Required ? | Description |
 | --- | --- | --- |
-| `source` | Yes | Path + filename of the `.warc.gz` or `.wacz`. Can contain a path. <br>Must either be present in the [`/archives/` folder](/html/archives/) or on the remote server defined in `nginx.conf`. |
+| `source` | Yes | Path + filename of the `.warc`, `.warc.gz` or `.wacz`. Can contain a path. <br>Must either be present in the [`/archives/` folder](/html/archives/) or on the remote server defined in `nginx.conf`. |
 | `url` | No | Url of a page within the archive to display. If not set, will try to open the first page available. | 
 | `ts`| No | Timestamp of the page to retrieve. Can be either a YYYYMMDDHHMMSS-formatted string or a millisecond timestamp or a. |
 | `embed` | No | `<replay-web-page>`'s [embed mode](https://replayweb.page/docs/embedding). Can be set to `replayonly` to hide its UI. |
@@ -88,7 +88,7 @@ www.example.com: Has iframes pointing at warcembed.example.com
 ### /*.[wacz|warc.gz]
 
 ### Role
-Pulls, caches and serves a given `.warc.gz` or `.wacz` file, with full support for range requests.
+Pulls, caches and serves a given `.warc`, `.warc.gz` or `.wacz` file, with full support for range requests.
 
 Will first look for the path + file given in the local [`/archives/` folder](/html/archives/), and try to proxy it from the remote server defined in `nginx.conf`.
 
