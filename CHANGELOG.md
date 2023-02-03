@@ -1,3 +1,6 @@
+## v0.0.6 - Feb 03 2023 
+- Upgraded to `<replay-web-page>` 1.7.12 
+
 ## v0.0.5 - Jan 16 2023 
 - Upgraded to `<replay-web-page>` 1.7.11 
 - Added support for `.warc`
@@ -15,7 +18,7 @@
 
 ---
 
-## v0.0.1 - Oct 5 2022 
+## v0.0.1 - Oct 05 2022 
 - Implemented two-way communication system using post messages (see readme).
 - Upgraded to `<replay-web-page>` 1.7.0
 - Aligned parameter names with `<replay-web-page>` attribute names:
