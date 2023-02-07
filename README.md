@@ -70,7 +70,7 @@ www.example.com: Has iframes pointing at warcembed.example.com
 | Name | Required ? | Description |
 | --- | --- | --- |
 | `source` | Yes | Path + filename of the `.warc`, `.warc.gz` or `.wacz`. Can contain a path. <br>Must either be present in the [`/archives/` folder](/html/archives/) or on the remote server defined in `nginx.conf`. |
-| `url` | No | Url of a page within the archive to display. If not set, will try to open the first page available. | 
+| `url` | No | Url of a page within the archive to display. | 
 | `ts`| No | Timestamp of the page to retrieve. Can be either a YYYYMMDDHHMMSS-formatted string or a millisecond timestamp or a. |
 | `embed` | No | `<replay-web-page>`'s [embed mode](https://replayweb.page/docs/embedding). Can be set to `replayonly` to hide its UI. |
 | `deepLink` | No | `<replay-web-page>`'s [`deepLink` mode](https://replayweb.page/docs/embedding). |
