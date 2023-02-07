@@ -15,7 +15,6 @@ if (params.get("source") === null) {
 // Prepare and inject `<replay-web-page>`
 //------------------------------------------------------------------------------
 player.setAttribute("source", `/${params.get("source")}`);
-player.setAttribute("url", `page:0`);
 player.setAttribute("replayBase", "/replay-web-page/");
 player.setAttribute("embed", "default");
 player.setAttribute("requireSubDomainIframe", "");

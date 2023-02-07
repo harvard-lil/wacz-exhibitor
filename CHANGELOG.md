@@ -1,3 +1,6 @@
+## v0.0.7 - Feb 07 2023 
+- Allow `?url` to remain unspecified to match `<replay-web-page>`'s behavior.
+
 ## v0.0.6 - Feb 03 2023 
 - Upgraded to `<replay-web-page>` 1.7.12 
 
