@@ -1,3 +1,7 @@
+## v0.0.8 - Feb 27 2023 
+- Comments fix in `nginx.conf`
+- Upgraded to `<replay-web-page>` 1.7.13
+
 ## v0.0.7 - Feb 07 2023 
 - Allow `?url` to remain unspecified to match `<replay-web-page>`'s behavior.
 
