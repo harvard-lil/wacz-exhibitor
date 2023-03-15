@@ -10,6 +10,8 @@ This implementation:
 
 📖 See also: [Blog post](https://lil.law.harvard.edu/blog/2022/09/15/opportunities-and-challenges-of-client-side-playback/ "Blog post on lil.law.harvard.edu - Web Archiving: Opportunities and Challenges of Client-Side Playback")
 
+<a href="https://tools.perma.cc"><img src="https://github.com/harvard-lil/tools.perma.cc/blob/main/perma-tools.png?raw=1" alt="Perma Tools" width="150"></a>
+
 ---
 
 ## Summary
