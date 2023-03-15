@@ -6,9 +6,7 @@ This implementation:
 - Serves, proxies and [caches](https://www.nginx.com/blog/smart-efficient-byte-range-caching-nginx/) web archive files using [NGINX](https://www.nginx.com/). 
 - Allows for two-way communication between the embedding website and the embedded archive using post messages.
 
-🖼️ [Live Demo](https://warcembed-demo.lil.tools)
-
-📖 See also: [Blog post](https://lil.law.harvard.edu/blog/2022/09/15/opportunities-and-challenges-of-client-side-playback/ "Blog post on lil.law.harvard.edu - Web Archiving: Opportunities and Challenges of Client-Side Playback")
+See also: [Live Demo](https://warcembed-demo.lil.tools), [Blog post](https://lil.law.harvard.edu/blog/2022/09/15/opportunities-and-challenges-of-client-side-playback/ "Blog post on lil.law.harvard.edu - Web Archiving: Opportunities and Challenges of Client-Side Playback")
 
 <a href="https://tools.perma.cc"><img src="https://github.com/harvard-lil/tools.perma.cc/blob/main/perma-tools.png?raw=1" alt="Perma Tools" width="150"></a>
 
