@@ -52,7 +52,7 @@ window.addEventListener("message", (event) => {
   try {
     if (event.source.location.pathname === player.getAttribute("replayBase")) {
       parent.window.postMessage(
-        { warcEmbedHref: window.location.href, ...event.data },
+        { waczExhibitorHref: window.location.href, ...event.data },
         "*"
       );
     }
@@ -80,7 +80,7 @@ window.addEventListener("message", (event) => {
     // This value indicates whether or not the service worker is ready.
     if (event.data["getInited"]) {
       parent.window.postMessage(
-        { inited: player.__inited, warcEmbedHref: window.location.href },
+        { inited: player.__inited, waczExhibitorHref: window.location.href },
         event.origin
       );
     }
@@ -104,7 +104,7 @@ window.addEventListener("message", (event) => {
       }
 
       parent.window.postMessage(
-        { collInfo: collInfo, warcEmbedHref: window.location.href },
+        { collInfo: collInfo, waczExhibitorHref: window.location.href },
         event.origin
       );
     }

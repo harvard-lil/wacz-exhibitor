@@ -1,4 +1,4 @@
-# warc-embed 🏛️
+# wacz-exhibitor 🏛️
 Experimental proxy and wrapper boilerplate for safely and efficiently embedding Web Archives (`.warc`, `.warc.gz`, `.wacz`) into web pages. 
 
 This implementation:
@@ -25,12 +25,12 @@ See also: [Live Demo](https://warcembed-demo.lil.tools), [Blog post](https://lil
 ## Concept
 
 ### "It's a wrapper"
-`warc-embed` serves an HTML document containing a pre-configured instance of [`<replay-web-page>`](https://replayweb.page/), [webrecorder's front-end archive playback system](https://webrecorder.net/), pointing at a proxied version of the requested archive. 
+`wacz-exhibitor` serves an HTML document containing a pre-configured instance of [`<replay-web-page>`](https://replayweb.page/), [webrecorder's front-end archive playback system](https://webrecorder.net/), pointing at a proxied version of the requested archive. 
 
 The playback will only start when said document is embedded in a cross-origin `<iframe>` for security reasons _(XSS prevention in the context of an `<iframe>` needing both `allow-script` and `allow-same-origin`)_.  
 
 ### "It's a proxy"
-`warc-embed` pulls and serves the requested archive file in the format required by `<replay-web-page>` _(right [`Content-Type`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type), support for [range requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests), CORS resolution)_.  
+`wacz-exhibitor` pulls and serves the requested archive file in the format required by `<replay-web-page>` _(right [`Content-Type`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type), support for [range requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests), CORS resolution)_.  
 
 **The requested archive can be sourced from either:**
 - The local [`/archives/` folder](/html/archives/). This is where the server will look first.
@@ -40,7 +40,7 @@ The playback will only start when said document is embedded in a cross-origin `<
 ```html
 <!-- On https://*.domain.ext: -->
 <iframe
-  src="https://warcembed.domain.ext/?source=archive.warc.gz&url=https://what-was-archived.ext/path"
+  src="https://wacz.domain.ext/?source=archive.warc.gz&url=https://what-was-archived.ext/path"
   allow="allow-scripts allow-forms allow-same-origin"
 >
 </iframe>
@@ -59,8 +59,8 @@ Serves [an HTML document containing an instance of `<replay-web-page>`](/html/em
 
 Must be embedded in a cross-origin `<iframe>`, preferably on the same parent domain to avoid thrid-party cookie limitations:
 ```
-warcembed.example.com: Hosts warc-embed
-www.example.com: Has iframes pointing at warcembed.example.com
+wacz.example.com: Hosts wacz-exhibitor
+www.example.com: Has iframes pointing at wacz.example.com
 ```
 
 #### Methods
@@ -79,7 +79,7 @@ www.example.com: Has iframes pointing at warcembed.example.com
 ```html
 <!-- On https://*.domain.ext: -->
 <iframe
-  src="https://warcembed.domain.ext/?source=archive.warc.gz&url=https://what-was-archived.ext/path"
+  src="https://wacz.domain.ext/?source=archive.warc.gz&url=https://what-was-archived.ext/path"
   allow="allow-scripts allow-forms allow-same-origin"
 >
 </iframe>
@@ -100,12 +100,12 @@ Will first look for the path + file given in the local [`/archives/` folder](/ht
 This project consists of a single `Dockerfile` derived from [the official NGINX Docker image](https://hub.docker.com/_/nginx), which can be deployed on any docker-compatible machine. 
 
 ### Example
-The following example describes the process of deploying `warc-embed` on [fly.io](https://fly.io), a platform-as-a-service provider. 
+The following example describes the process of deploying `wacz-exhibitor` on [fly.io](https://fly.io), a platform-as-a-service provider. 
 1. `nginx.conf` needs to be edited. See comments starting with `EDIT:` in the document for instructions.
 2. Install the [`flyctl`](https://fly.io/docs/hands-on/install-flyctl/) client and [sign-in](https://fly.io/docs/hands-on/sign-in/), if not already done.
 3. Initialize and deploy the project by running the `flyctl launch` command _(use `flyctl deploy` for subsequent deploys)_. 
-4. `warc-embed` is now live and visible on the [`fly.io` dashboard](https://fly.io/dashboard). 
-5. We highly recommend setting up a **custom domain and SSL certificate**. This can be done directly from the `fly.io` dashboard. Ideally, the target domain should be a subdomain of the website on which `warc-embed` iframes are going to be embedded: for example, `www.domain.ext` embedding an `<iframe>` from `warcembed.domain.ext`.
+4. `wacz-exhibitor` is now live and visible on the [`fly.io` dashboard](https://fly.io/dashboard). 
+5. We highly recommend setting up a **custom domain and SSL certificate**. This can be done directly from the `fly.io` dashboard. Ideally, the target domain should be a subdomain of the website on which `wacz-exhibitor` iframes are going to be embedded: for example, `www.domain.ext` embedding an `<iframe>` from `wacz.domain.ext`.
 
 [☝️ Back to summary](#summary)
 
@@ -113,11 +113,11 @@ The following example describes the process of deploying `warc-embed` on [fly.io
 
 ## Local development
 
-### Example: Running `warc-embed` locally using docker
+### Example: Running `wacz-exhibitor` locally using docker
 ```bash
-docker build . -t warc-embed-local
-docker run --rm -p 8080:8080 warc-embed-local
-# warc-embed is now accessible on http://localhost:8080
+docker build . -t wacz-exhibitor-local
+docker run --rm -p 8080:8080 wacz-exhibitor-local
+# wacz-exhibitor is now accessible on http://localhost:8080
 ```
 
 [☝️ Back to summary](#summary)
@@ -126,11 +126,11 @@ docker run --rm -p 8080:8080 warc-embed-local
 
 ## Communicating with the embedded archive
 
-`warc-embed` allows the embedding website to communicate with the embedded archive playback using [post messages](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage). 
-All messages coming _from_ a `warc-embed` `<iframe>` come with a `warcEmbedHref` property, helping identify the sender.  
+`wacz-exhibitor` allows the embedding website to communicate with the embedded archive playback using [post messages](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage). 
+All messages coming _from_ a `wacz-exhibitor` `<iframe>` come with a `waczExhibitorHref` property, helping identify the sender.  
 
-### Messages interpreted by the `warc-embed` `<iframe>`
-`warc-embed` will look for the following properties in messages coming from the embedding website and react accordingly:
+### Messages interpreted by the `wacz-exhibitor` `<iframe>`
+`wacz-exhibitor` will look for the following properties in messages coming from the embedding website and react accordingly:
 
 | Property name | Expected value | Description |
 | --- | --- | --- |
@@ -140,36 +140,36 @@ All messages coming _from_ a `warc-embed` `<iframe>` come with a `warcEmbedHref`
 | `getInited` | Boolean | If provided, will send a post message back with the current value of `<replay-web-page>`s `inited` property, indicating whether or not the service worker is ready. | 
 
 ### Messages hoisted from `<replay-web-page>`
-`warc-embed` will forward to the embedding website every post message sent by `<replay-web-page>`'s service worker. 
+`wacz-exhibitor` will forward to the embedding website every post message sent by `<replay-web-page>`'s service worker. 
 
 The most common example is the following, which is sent during navigation within an archive:
 
 ```json
 {
-  "warcEmbedHref": "https://warcembed.domain.ext/?source=archive.warc.gz&url=https://what-was-archived.ext/path",
+  "waczExhibitorHref": "https://wacz.domain.ext/?source=archive.warc.gz&url=https://what-was-archived.ext/path",
   "url": "https://what-was-archived.ext/new-path/",
   "view": "pages",
   "ts": "20220816162527"
 }
 ```
 
-### Example: Intercepting messages from a `warc-embed` `<iframe>`
+### Example: Intercepting messages from a `wacz-exhibitor` `<iframe>`
 ```javascript
-// Assuming: there's only 1 <iframe class="warc-embed">  
-const playback = document.querySelector("iframe.warc-embed");
+// Assuming: there's only 1 <iframe class="wacz-exhibitor">  
+const playback = document.querySelector("iframe.wacz-exhibitor");
 
 window.addEventListener("message", (e) => {
-  // This message bears data and comes from the `warc-embed` <iframe>
+  // This message bears data and comes from the `wacz-exhibitor` <iframe>
   if (event?.data && event.source === playback.contentWindow) {
     console.log(event);
   }
 });
 ```
 
-### Example: Sending a message to a `warc-embed` `<iframe>`
+### Example: Sending a message to a `wacz-exhibitor` `<iframe>`
 ```javascript
-// Assuming: there's only 1 <iframe class="warc-embed">  
-const playback = document.querySelector("iframe.warc-embed");
+// Assuming: there's only 1 <iframe class="wacz-exhibitor">  
+const playback = document.querySelector("iframe.wacz-exhibitor");
 const playbackOrigin = new URL(playback.src).origin;
 
 playback.contentWindow.postMessage(
