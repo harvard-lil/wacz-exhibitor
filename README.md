@@ -1,4 +1,4 @@
-# Wacz-Exhibitor 🏛️
+# wacz-exhibitor 🏛️
 Experimental proxy and wrapper boilerplate for safely and efficiently embedding Web Archives (`.warc`, `.warc.gz`, `.wacz`) into web pages. 
 
 This implementation:
