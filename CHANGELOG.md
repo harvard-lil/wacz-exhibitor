@@ -1,3 +1,6 @@
+## v0.0.9 - Apr 06 2023 
+- Upgraded to `<replay-web-page>` 1.7.14
+
 ## v0.0.8 - Feb 27 2023 
 - Comments fix in `nginx.conf`
 - Upgraded to `<replay-web-page>` 1.7.13
