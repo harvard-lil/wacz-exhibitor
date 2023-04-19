@@ -80,12 +80,12 @@ www.example.com: Has iframes pointing at wacz.example.com
 <!-- On https://*.domain.ext: -->
 <iframe
   src="https://wacz.domain.ext/?source=archive.warc.gz&url=https://what-was-archived.ext/path"
-  allow="allow-scripts allow-forms allow-same-origin"
+  allow="allow-scripts allow-forms allow-same-origin allow-downloads"
 >
 </iframe>
 ```
 
-### /*.[wacz|warc.gz]
+### /*.[wacz|warc|warc.gz]
 
 ### Role
 Pulls, caches and serves a given `.warc`, `.warc.gz` or `.wacz` file, with full support for range requests.

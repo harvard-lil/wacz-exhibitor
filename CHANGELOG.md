@@ -1,25 +1,44 @@
+## v0.0.10 - Apr 19 2023
+- Added (experimental) Content Security Policy to prevent potential service worker leaks.
+
+---
+
 ## v0.0.9 - Apr 06 2023 
 - Upgraded to `<replay-web-page>` 1.7.14
+
+---
 
 ## v0.0.8 - Feb 27 2023 
 - Comments fix in `nginx.conf`
 - Upgraded to `<replay-web-page>` 1.7.13
 
+---
+
 ## v0.0.7 - Feb 07 2023 
 - Allow `?url` to remain unspecified to match `<replay-web-page>`'s behavior.
 
+---
+
 ## v0.0.6 - Feb 03 2023 
 - Upgraded to `<replay-web-page>` 1.7.12 
+
+---
 
 ## v0.0.5 - Jan 16 2023 
 - Upgraded to `<replay-web-page>` 1.7.11 
 - Added support for `.warc`
 
+---
+
 ## v0.0.4 - Dec 19 2022
 - Upgraded to `<replay-web-page>` 1.7.9 
 
+---
+
 ## v0.0.3 - Dec 05 2022
 - Upgraded to `<replay-web-page>` 1.7.7 
+
+---
 
 ## v0.0.2 - Oct 11 2022
 - Moved from `docker-compose` to a single, more generic and hopefully universal `Dockerfile`.
