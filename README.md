@@ -63,7 +63,7 @@ wacz.example.com -> Hosts wacz-exhibitor
 #### Role
 Serves [an HTML document containing an instance of `<replay-web-page>`](/html/embed/index.html), pointing at a proxied archive file. 
 
-Must be embedded in a cross-origin `<iframe>`, preferably on the same parent domain to avoid thrid-party cookie limitations.
+Must be embedded in a cross-origin `<iframe>`, preferably on the same parent domain to avoid third-party cookie limitations.
 
 #### Methods
 `GET`, `HEAD`
