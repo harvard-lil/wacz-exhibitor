@@ -38,7 +38,7 @@ See also: [Live Demo](https://warcembed-demo.lil.tools), [Blog post](https://lil
 
 The playback will only start if said HTML document is embedded in a cross-origin `<iframe>` for security reasons _(XSS prevention in the context of an `<iframe>` needing both `allow-script` and `allow-same-origin`)_.  
 
-We recommend hosting `wacz-exhibitor` on a subdomain of the embedding website to avoid thrid-party cookie limitations:
+We recommend hosting `wacz-exhibitor` on a subdomain of the embedding website to avoid third-party cookie limitations:
 ```
 www.example.com -> Has iframes pointing at wacz.example.com
 wacz.example.com -> Hosts wacz-exhibitor
