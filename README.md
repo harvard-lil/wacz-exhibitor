@@ -6,6 +6,15 @@ This implementation:
 - Serves, proxies and [caches](https://www.nginx.com/blog/smart-efficient-byte-range-caching-nginx/) web archive files using [NGINX](https://www.nginx.com/). 
 - Allows for two-way communication between the embedding website and the embedded archive using post messages.
 
+```html
+<!-- Safely embedding "archive.wacz" on https://example.com: -->
+<iframe
+  src="https://wacz.example.com/?source=archive.wacz&url=https://what-was-archived.ext/path"
+  allow="allow-scripts allow-forms allow-same-origin"
+>
+</iframe>
+```
+
 See also: [Live Demo](https://warcembed-demo.lil.tools), [Blog post](https://lil.law.harvard.edu/blog/2022/09/15/opportunities-and-challenges-of-client-side-playback/ "Blog post on lil.law.harvard.edu - Web Archiving: Opportunities and Challenges of Client-Side Playback")
 
 <a href="https://tools.perma.cc"><img src="https://github.com/harvard-lil/tools.perma.cc/blob/main/perma-tools.png?raw=1" alt="Perma Tools" width="150"></a>
@@ -25,26 +34,23 @@ See also: [Live Demo](https://warcembed-demo.lil.tools), [Blog post](https://lil
 ## Concept
 
 ### "It's a wrapper"
-`wacz-exhibitor` serves an HTML document containing a pre-configured instance of [`<replay-web-page>`](https://replayweb.page/), [webrecorder's front-end archive playback system](https://webrecorder.net/), pointing at a proxied version of the requested archive. 
+`wacz-exhibitor` serves an HTML document containing a pre-configured instance of [`<replay-web-page>`](https://replayweb.page/), [webrecorder's client-side web archives playback system](https://webrecorder.net/), pointing at a proxied version of the requested WARC/WACZ file. 
 
-The playback will only start when said document is embedded in a cross-origin `<iframe>` for security reasons _(XSS prevention in the context of an `<iframe>` needing both `allow-script` and `allow-same-origin`)_.  
+The playback will only start if said HTML document is embedded in a cross-origin `<iframe>` for security reasons _(XSS prevention in the context of an `<iframe>` needing both `allow-script` and `allow-same-origin`)_.  
+
+We recommend hosting `wacz-exhibitor` on a subdomain of the embedding website to avoid thrid-party cookie limitations:
+```
+www.example.com -> Has iframes pointing at wacz.example.com
+wacz.example.com -> Hosts wacz-exhibitor
+```
 
 ### "It's a proxy"
-`wacz-exhibitor` pulls and serves the requested archive file in the format required by `<replay-web-page>` _(right [`Content-Type`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type), support for [range requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests), CORS resolution)_.  
+`wacz-exhibitor` pulls and serves the requested archive file in the format required by `<replay-web-page>` _(right [`Content-Type`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type), support for [range requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests), CORS resolution and Content Security Policy)_.  
 
-**The requested archive can be sourced from either:**
+**The requested web archive file can be sourced from either:**
 - The local [`/archives/` folder](/html/archives/). This is where the server will look first.
 - A remote location the server will proxy from, defined in `nginx.conf`.
 
-### Example 
-```html
-<!-- On https://*.domain.ext: -->
-<iframe
-  src="https://wacz.domain.ext/?source=archive.warc.gz&url=https://what-was-archived.ext/path"
-  allow="allow-scripts allow-forms allow-same-origin"
->
-</iframe>
-```
 
 [☝️ Back to summary](#summary)
 
@@ -57,11 +63,7 @@ The playback will only start when said document is embedded in a cross-origin `<
 #### Role
 Serves [an HTML document containing an instance of `<replay-web-page>`](/html/embed/index.html), pointing at a proxied archive file. 
 
-Must be embedded in a cross-origin `<iframe>`, preferably on the same parent domain to avoid thrid-party cookie limitations:
-```
-wacz.example.com: Hosts wacz-exhibitor
-www.example.com: Has iframes pointing at wacz.example.com
-```
+Must be embedded in a cross-origin `<iframe>`, preferably on the same parent domain to avoid thrid-party cookie limitations.
 
 #### Methods
 `GET`, `HEAD`
@@ -128,6 +130,8 @@ docker run --rm -p 8080:8080 wacz-exhibitor-local
 
 `wacz-exhibitor` allows the embedding website to communicate with the embedded archive playback using [post messages](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage). 
 All messages coming _from_ a `wacz-exhibitor` `<iframe>` come with a `waczExhibitorHref` property, helping identify the sender.  
+
+This feature can be used to build [interactive experiences](https://warcembed-demo.lil.tools/test8) using web archive files.
 
 ### Messages interpreted by the `wacz-exhibitor` `<iframe>`
 `wacz-exhibitor` will look for the following properties in messages coming from the embedding website and react accordingly:
