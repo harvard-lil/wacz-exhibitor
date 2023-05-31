@@ -71,7 +71,7 @@ Must be embedded in a cross-origin `<iframe>`, preferably on the same parent dom
 #### Query parameters
 | Name | Required ? | Description |
 | --- | --- | --- |
-| `source` | Yes | Path + filename of the `.warc`, `.warc.gz` or `.wacz`. Can contain a path. <br>Must either be present in the [`/archives/` folder](/html/archives/) or on the remote server defined in `nginx.conf`. |
+| `source` | Yes | Filename of the `.warc`, `.warc.gz` or `.wacz`. Can contain a path, but cannot be a url. <br>The file must either be present in the [`/archives/` folder](/html/archives/) or on the remote server defined in `nginx.conf`. |
 | `url` | No | Url of a page within the archive to display. | 
 | `ts`| No | Timestamp of the page to retrieve. Can be either a YYYYMMDDHHMMSS-formatted string or a millisecond timestamp or a. |
 | `embed` | No | `<replay-web-page>`'s [embed mode](https://replayweb.page/docs/embedding). Can be set to `replayonly` to hide its UI. |
@@ -162,7 +162,7 @@ The most common example is the following, which is sent during navigation within
 // Assuming: there's only 1 <iframe class="wacz-exhibitor">  
 const playback = document.querySelector("iframe.wacz-exhibitor");
 
-window.addEventListener("message", (e) => {
+window.addEventListener("message", (event) => {
   // This message bears data and comes from the `wacz-exhibitor` <iframe>
   if (event?.data && event.source === playback.contentWindow) {
     console.log(event);
@@ -177,7 +177,7 @@ const playback = document.querySelector("iframe.wacz-exhibitor");
 const playbackOrigin = new URL(playback.src).origin;
 
 playback.contentWindow.postMessage(
-  {"setUrl": "https://what-was-archived.ext/new-path"},
+  {"updateUrl": "https://what-was-archived.ext/new-path"},
   playbackOrigin
 );
 ```
