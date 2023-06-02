@@ -1,3 +1,8 @@
+## v0.0.11 - Jun 02 2023
+- Updated to `<replay-web-page>` 1.7.15
+
+---
+
 ## v0.0.10 - Apr 19 2023
 - Added (experimental) Content Security Policy to prevent potential service worker leaks.
 
