@@ -1,3 +1,8 @@
+## v0.0.12 - Jun 15 2023
+- Updated to `<replay-web-page>` 1.8.0
+
+---
+
 ## v0.0.11 - Jun 02 2023
 - Updated to `<replay-web-page>` 1.7.15
 
