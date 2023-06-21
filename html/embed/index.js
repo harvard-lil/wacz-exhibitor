@@ -109,6 +109,26 @@ window.addEventListener("message", (event) => {
       );
     }
 
+    // `overrideElementAttribute`
+    //
+    // Allows hosts to improve specific playback experiences
+    // by altering the attributes of a targeted HTML element in the playback.
+    //
+    // Pries into `<replay-web-page>`, retrieves the element with the specified selector,
+    // and applies the requested attribute.
+    //
+    // Delegates to the async helper function overrideElementAttribute
+    if (event.data["overrideElementAttribute"]) {
+      overrideElementAttribute(
+        event.origin,
+        player,
+        parent,
+        event.data["overrideElementAttribute"]["selector"],
+        event.data["overrideElementAttribute"]["attributeName"],
+        event.data["overrideElementAttribute"]["attributeContents"]
+      );
+    }
+
   }
 
 }, false);
@@ -139,4 +159,76 @@ function handleTsParam(ts) {
   }
 
   return ts;
+}
+
+/**
+ * Waits for a given element to be in the DOM and returns it.
+ * Wait is based on `requestAnimationFrame`: timeout is approximately 60 seconds (60 x 60 frames per seconds).
+ *
+ * Takes a function querying the DOM for a single element as an argument
+ */
+async function waitForElement(selectorFunction) {
+  const maxPauseSeconds = 60
+  let tries = maxPauseSeconds * 60;  // we expect a repaint rate of ~60 times a second, per https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
+  let elem = null;
+
+  while (!elem && tries > 0) {
+    // Sleep efficiently until the next repaint
+    const pause = await new Promise(resolve => requestAnimationFrame(resolve));
+    cancelAnimationFrame(pause);
+
+    // Look for the target element
+    try {
+      elem = selectorFunction();
+    }
+    catch (err) {
+      if (!err.message.includes('null')) {
+        throw err;
+      }
+      tries -= 1;
+    }
+  }
+
+  if (elem) {
+    return elem;
+  }
+
+  throw new Error("Timed out");
+}
+
+/**
+ * Async helper function for handling `overrideElementAttribute` messages.
+ * Posts `overrideElementAttribute` back to the parent frame on failure.
+ */
+async function overrideElementAttribute(origin, player, parent, selector, attributeName, attributeContents){
+  try {
+    const targetElem = await waitForElement(() => {
+      return player.shadowRoot
+        .querySelector('iframe')
+        .contentDocument
+        .querySelector('replay-app-main')
+        .shadowRoot
+        .querySelector('wr-coll')
+        .shadowRoot
+        .querySelector('wr-coll-replay')
+        .shadowRoot
+        .querySelector('iframe')
+        .contentDocument
+        .querySelector(selector);
+    })
+    targetElem.setAttribute(attributeName, attributeContents);
+  }
+  catch(err) {
+    if (!err.message.includes('Timed out')) {
+      throw err;
+    }
+    parent.window.postMessage(
+      {"overrideElementAttribute": {
+        "status": "timed out",
+        "request": event.data["overrideElementAttribute"],
+        waczExhibitorHref: window.location.href
+      }},
+      origin
+    );
+  }
 }
