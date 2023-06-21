@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>wacz-exhibitor sandbox</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow"/>
+
+    <style type="text/css">
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-family: monospace;
+      font-size: 18px;
+    }
+
+    body {
+      width: 100%;
+      text-align: center;
+    }
+
+    iframe {
+      display: block;
+      width: 90%;
+      max-width: 90%;
+      min-height: 85vh;
+      margin: auto;
+      border: 0.25rem solid black;
+      border-radius: 0.5rem;
+    }
+    </style>
+  </head>
+
+  <body id="item">
+    
+    <h1>wacz-exhibitor sandbox</h1>
+
+    <p>Test: embedding a wacz-exhibitor <code>&lt;iframe&gt;</code></p>
+
+    <iframe 
+      src="http://localhost:8080/?source=MY-FILE.wacz&url=page:0" 
+      sandbox="allow-scripts allow-modals allow-forms allow-same-origin allow-downloads"
+    ></iframe>
+
+  </body>
+
+</html>
