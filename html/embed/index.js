@@ -168,7 +168,7 @@ function handleTsParam(ts) {
  * Takes a function querying the DOM for a single element as an argument
  */
 async function waitForElement(selectorFunction) {
-  const maxPauseSeconds = 60
+  const maxPauseSeconds = 60;
   let tries = maxPauseSeconds * 60;  // we expect a repaint rate of ~60 times a second, per https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
   let elem = null;
 
