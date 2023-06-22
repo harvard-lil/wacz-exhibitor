@@ -142,7 +142,7 @@ This feature can be used to build [interactive experiences](https://warcembed-de
 | `updateTs` | Number | If provided, will replace the current `ts` parameter of `<replay-web-page>`. |
 | `getCollInfo` | Boolean | If provided, will send a post message back with `<replay-web-page>`'s `collInfo` object, containing meta information about the currently-loaded archive. |
 | `getInited` | Boolean | If provided, will send a post message back with the current value of `<replay-web-page>`s `inited` property, indicating whether or not the service worker is ready. |
-| `overrideElementAttribute` | !!Add type description here!! | If provided, will look for the element with the specified CSS selector inside `<replay-web-page>` and if found, apply the requested HTML attribute to it. If the element is not found, will send a post message back reporting `"status": "timed out"`, along with a copy of the original message's `data`. |
+| `overrideElementAttribute` | [`HTMLAttributeOverride`](https://github.com/harvard-lil/wacz-exhibitor/blob/main/html/embed/index.js) | If provided, will look for the element with the specified CSS selector inside `<replay-web-page>` and if found, apply the requested HTML attribute to it. If the element is not found, will send a post message back reporting `"status": "timed out"`, along with a copy of the original message's `data`. |
 
 ### Messages hoisted from `<replay-web-page>`
 `wacz-exhibitor` will forward to the embedding website every post message sent by `<replay-web-page>`'s service worker. 

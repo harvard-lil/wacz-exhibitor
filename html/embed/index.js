@@ -1,4 +1,14 @@
 //------------------------------------------------------------------------------
+// Type definitions
+//------------------------------------------------------------------------------
+/**
+ * @typedef {Object} HTMLAttributeOverride
+ * @property {string} selector - CSS selector for the target HTML element
+ * @property {string} attributeName - the name of the HTML attribute to apply to the target
+ * @property {string} attributeContents - the value of the HTML attribute to apply to the target
+ */
+
+//------------------------------------------------------------------------------
 // Module-level variables
 //------------------------------------------------------------------------------
 const params = new URLSearchParams(window.location.search);
@@ -123,9 +133,11 @@ window.addEventListener("message", (event) => {
         event.origin,
         player,
         parent,
-        event.data["overrideElementAttribute"]["selector"],
-        event.data["overrideElementAttribute"]["attributeName"],
-        event.data["overrideElementAttribute"]["attributeContents"]
+        {
+          selector: event.data["overrideElementAttribute"]["selector"],
+          attributeName: event.data["overrideElementAttribute"]["attributeName"],
+          attributeContents: event.data["overrideElementAttribute"]["attributeContents"]
+        }
       );
     }
 
@@ -166,6 +178,9 @@ function handleTsParam(ts) {
  * Wait is based on `requestAnimationFrame`: timeout is approximately 60 seconds (60 x 60 frames per seconds).
  *
  * Takes a function querying the DOM for a single element as an argument
+ *
+ * @param {function} selectorFunction - Function to be run to find the element.
+ * @returns {Promise<HTMLElement>} Reference to the element that was found.
  */
 async function waitForElement(selectorFunction) {
   const maxPauseSeconds = 60;
@@ -199,8 +214,15 @@ async function waitForElement(selectorFunction) {
 /**
  * Async helper function for handling `overrideElementAttribute` messages.
  * Posts `overrideElementAttribute` back to the parent frame on failure.
+ *
+ * @param {string} origin - The origin of the posted message (see: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent/origin).
+ * @param {HTMLElement} player - The <replay-web-page> element.
+ * @param {HTMLElement} parent - https://developer.mozilla.org/en-US/docs/Web/API/Window/parent
+ * @param {HTMLAttributeOverride} overrideElementAttribute - Specifies which HTML element to change, and how.
+ * @returns {Promise<void>}
  */
-async function overrideElementAttribute(origin, player, parent, selector, attributeName, attributeContents) {
+async function overrideElementAttribute(origin, player, parent, overrideElementAttribute) {
+  const { selector, attributeName, attributeContents } = overrideElementAttribute;
   try {
     const targetElem = await waitForElement(() => {
       return player.shadowRoot
@@ -225,7 +247,7 @@ async function overrideElementAttribute(origin, player, parent, selector, attrib
     parent.window.postMessage(
       {"overrideElementAttribute": {
         "status": "timed out",
-        "request": event.data["overrideElementAttribute"],
+        "request": overrideElementAttribute,
         waczExhibitorHref: window.location.href
       }},
       origin
