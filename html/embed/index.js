@@ -185,8 +185,6 @@ class TimeoutError extends Error {
  * Waits for a given element to be in the DOM and returns it.
  * Wait is based on `requestAnimationFrame`: timeout is approximately 60 seconds (60 x 60 frames per seconds).
  *
- * Takes a function querying the DOM for a single element as an argument
- *
  * @param {function} selectorFunction - Function to be run to find the element.
  * @returns {Promise<HTMLElement>} Reference to the element that was found.
  */
