@@ -208,6 +208,8 @@ async function waitForElement(selectorFunction) {
       if (!err.message.includes('null')) {
         throw err;
       }
+    }
+    if (!elem) {
       tries -= 1;
     }
   }
