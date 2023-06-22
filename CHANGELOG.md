@@ -1,3 +1,8 @@
+## v0.1.0 - Jun 22 2023
+- Changelog moved to release notes on GitHub 👋
+
+---
+
 ## v0.0.12 - Jun 15 2023
 - Updated to `<replay-web-page>` 1.8.0
 
