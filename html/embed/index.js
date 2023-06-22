@@ -173,7 +173,10 @@ function handleTsParam(ts) {
   return ts;
 }
 
-class TimeoutError extends Error {
+/**
+ * To be thrown whenever `waitForElement` fails to find an element after exhausting all allowed retries.
+ */
+class WaitForElementTimeoutError extends Error {
   constructor(message) {
     super(message);
     this.name = "TimeoutError";
@@ -216,7 +219,7 @@ async function waitForElement(selectorFunction) {
     return elem;
   }
 
-  throw new TimeoutError(`Did not find element in ${maxPauseSeconds}s`);
+  throw new WaitForElementTimeoutError(`Did not find element in ${maxPauseSeconds}s`);
 }
 
 /**
