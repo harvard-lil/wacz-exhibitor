@@ -28,7 +28,6 @@ player.setAttribute("source", `/${params.get("source")}`);
 player.setAttribute("replayBase", "/replay-web-page/");
 player.setAttribute("embed", "default");
 player.setAttribute("requireSubDomainIframe", "");
-player.setAttribute("sandbox", "");
 
 // Param: `url` (see: https://replayweb.page/docs/embedding)
 if (params.get("url")) {
@@ -49,6 +48,13 @@ if (["default", "full", "replayonly", "replay-with-info"].includes(params.get("e
 if (params.get("deepLink")) {
   player.setAttribute("deepLink", "");
 }
+
+// Param: `noSandbox` (see: https://replayweb.page/docs/embedding)
+// Default to sandboxing playbacks, but allow the host to override.
+if (!params.get("noSandbox")){
+  player.setAttribute("sandbox", "");
+}
+
 
 document.querySelector("body").appendChild(player);
 

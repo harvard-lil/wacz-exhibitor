@@ -76,6 +76,7 @@ Must be embedded in a cross-origin `<iframe>`, preferably on the same parent dom
 | `ts`| No | Timestamp of the page to retrieve. Can be either a YYYYMMDDHHMMSS-formatted string or a millisecond timestamp or a. |
 | `embed` | No | `<replay-web-page>`'s [embed mode](https://replayweb.page/docs/embedding). Can be set to `replayonly` to hide its UI. |
 | `deepLink` | No | `<replay-web-page>`'s [`deepLink` mode](https://replayweb.page/docs/embedding). |
+| `noSandbox` | No | If set, will remove the [`sandbox`](https://replayweb.page/docs/embedding) from the `<replay-web-page>` iframe. May be necessary for [certain playbacks](https://github.com/harvard-lil/wacz-exhibitor/issues/23); e.g., cross-browser compatible playbacks of PDFs. |
 
 #### Examples
 ```html
