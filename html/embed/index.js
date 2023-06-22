@@ -227,7 +227,7 @@ async function waitForElement(selectorFunction) {
  *
  * @param {string} origin - The origin of the posted message (see: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent/origin).
  * @param {HTMLElement} player - The <replay-web-page> element.
- * @param {HTMLElement} parent - https://developer.mozilla.org/en-US/docs/Web/API/Window/parent
+ * @param {Window} parent - https://developer.mozilla.org/en-US/docs/Web/API/Window/parent
  * @param {HTMLAttributeOverride} overrideElementAttribute - Specifies which HTML element to change, and how.
  * @returns {Promise<void>}
  */
