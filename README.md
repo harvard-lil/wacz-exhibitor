@@ -119,7 +119,18 @@ The following example describes the process of deploying `wacz-exhibitor` on [fl
 ```bash
 docker build . -t wacz-exhibitor-local
 docker run --rm -p 8080:8080 wacz-exhibitor-local
-# wacz-exhibitor is now accessible on http://localhost:8080
+# wacz-exhibitor is now accessible at http://localhost:8080
+```
+
+### Development Sandbox
+A minimal sandbox is available to test embedding wacz-exhibitor `<iframe>`s in webpages.
+
+You may edit `sandbox/index.html` to make it point to a specific web archive file  and run the following command to start the sandbox:
+
+```bash
+# Assuming: wacz-exhibitor is running on port 8080 ...
+bash start-sandbox.sh
+# The sandbox is now accessible at http://localhost:8000
 ```
 
 [☝️ Back to summary](#summary)
