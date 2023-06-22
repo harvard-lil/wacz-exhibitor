@@ -173,6 +173,14 @@ function handleTsParam(ts) {
   return ts;
 }
 
+class TimeoutError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "TimeoutError";
+    this.timeOutError = true;
+  }
+}
+
 /**
  * Waits for a given element to be in the DOM and returns it.
  * Wait is based on `requestAnimationFrame`: timeout is approximately 60 seconds (60 x 60 frames per seconds).
@@ -208,7 +216,7 @@ async function waitForElement(selectorFunction) {
     return elem;
   }
 
-  throw new Error("Timed out");
+  throw new TimeoutError(`Did not find element in ${maxPauseSeconds}s`);
 }
 
 /**
@@ -241,7 +249,7 @@ async function overrideElementAttribute(origin, player, parent, overrideElementA
     targetElem.setAttribute(attributeName, attributeContents);
   }
   catch(err) {
-    if (!err.message.includes('Timed out')) {
+    if (!('timeOutError' in err)) {
       throw err;
     }
     parent.window.postMessage(
