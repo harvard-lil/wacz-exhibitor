@@ -200,7 +200,7 @@ async function waitForElement(selectorFunction) {
  * Async helper function for handling `overrideElementAttribute` messages.
  * Posts `overrideElementAttribute` back to the parent frame on failure.
  */
-async function overrideElementAttribute(origin, player, parent, selector, attributeName, attributeContents){
+async function overrideElementAttribute(origin, player, parent, selector, attributeName, attributeContents) {
   try {
     const targetElem = await waitForElement(() => {
       return player.shadowRoot
