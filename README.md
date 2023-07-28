@@ -123,6 +123,8 @@ docker run --rm -p 8080:8080 wacz-exhibitor-local
 # wacz-exhibitor is now accessible at http://localhost:8080
 ```
 
+Shortcut: `start-dev.sh`
+
 ### Development Sandbox
 A minimal sandbox is available to test embedding wacz-exhibitor `<iframe>`s in webpages.
 
