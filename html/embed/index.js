@@ -247,7 +247,7 @@ async function overrideElementAttribute(origin, player, parent, overrideElementA
         .contentDocument
         .querySelector('replay-app-main')
         .shadowRoot
-        .querySelector('wr-coll')
+        .querySelector('wr-item')
         .shadowRoot
         .querySelector('wr-coll-replay')
         .shadowRoot
