@@ -112,8 +112,8 @@ window.addEventListener("message", (event) => {
           .contentDocument
           .querySelector("replay-app-main")
           .shadowRoot
-          .querySelector("wr-coll")
-          .__collInfo;
+          .querySelector("wr-item")
+          .itemInfo;
       }
       catch(err) {
         // console.log(err); // Not blocking | Just not ready.
