@@ -2,12 +2,12 @@
 Experimental proxy and wrapper boilerplate for safely and efficiently embedding Web Archives (`.warc`, `.warc.gz`, `.wacz`) into web pages. 
 
 This implementation:
-- Wraps [Webrecorder's `<replay-web-page>`](https://replayweb.page/docs/embedding) client-side playback technology.
+- Wraps [Webrecorder's replayweb.page](https://replayweb.page/docs/embedding) client-side playback technology.
 - Serves, proxies and [caches](https://www.nginx.com/blog/smart-efficient-byte-range-caching-nginx/) web archive files using [NGINX](https://www.nginx.com/). 
 - Allows for two-way communication between the embedding website and the embedded archive using post messages.
 
 ```html
-<!-- Safely embedding "archive.wacz" on https://example.com: -->
+<!-- Embedding a playback of archive.wacz on https://example.com -->
 <iframe
   src="https://wacz.example.com/?source=archive.wacz&url=https://what-was-archived.ext/path"
   allow="allow-scripts allow-forms allow-same-origin"
@@ -34,7 +34,7 @@ See also: [Live Demo](https://warcembed-demo.lil.tools), [Blog post](https://lil
 ## Concept
 
 ### "It's a wrapper"
-`wacz-exhibitor` serves an HTML document containing a pre-configured instance of [`<replay-web-page>`](https://replayweb.page/), [webrecorder's client-side web archives playback system](https://webrecorder.net/), pointing at a proxied version of the requested WARC/WACZ file. 
+`wacz-exhibitor` serves an HTML document containing a pre-configured instance of [replayweb.page](https://replayweb.page/), [webrecorder's client-side web archives playback system](https://webrecorder.net/), pointing at a proxied version of the requested WARC/WACZ file. 
 
 The playback will only start if said HTML document is embedded in a cross-origin `<iframe>` for security reasons _(XSS prevention in the context of an `<iframe>` needing both `allow-script` and `allow-same-origin`)_.  
 
