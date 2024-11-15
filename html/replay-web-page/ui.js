@@ -66,7 +66,7 @@ class Le extends Ce{constructor(e){if(super(e),this.it=J,e.type!==ze)throw Error
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-class Ie extends Le{}Ie.directiveName="unsafeSVG",Ie.resultType=2;const Ee=_e(Ie),Pe="important",De=" !"+Pe,Te=_e(class extends Ce{constructor(e){if(super(e),e.type!==Se||"style"!==e.name||e.strings?.length>2)throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.")}render(e){return Object.keys(e).reduce(((t,i)=>{const o=e[i];return null==o?t:t+`${i=i.includes("-")?i:i.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g,"-$&").toLowerCase()}:${o};`}),"")}update(e,[t]){const{style:i}=e.element;if(void 0===this.ft)return this.ft=new Set(Object.keys(t)),this.render(t);for(const e of this.ft)null==t[e]&&(this.ft.delete(e),e.includes("-")?i.removeProperty(e):i[e]=null);for(const e in t){const o=t[e];if(null!=o){this.ft.add(e);const t="string"==typeof o&&o.endsWith(De);e.includes("-")||t?i.setProperty(e,t?o.slice(0,-11):o,t?Pe:""):i[e]=o}}return Q}});var Fe,Re=__webpack_require__(989);const Me="./w/api",Ue="./w",Oe=c(Re.A);function Be(e){return[Oe,e]}const Ne=window.IS_APP||(null===(Fe=window.electron)||void 0===Fe?void 0:Fe.IS_APP)||window.matchMedia("(display-mode: standalone)").matches,je="2.2.0";function qe(e){" "==e.key&&(e.preventDefault(),e.target.click())}function He(e){const t=document.querySelector("head"),i=document.querySelectorAll("link[rel*='icon']");for(const e of i)t.removeChild(e);for(const i of e.icons){const e=document.createElement("link");e.rel=i.rel,e.href=i.href,t.appendChild(e)}}class We extends fe{constructor(){super(),this.size="1.1em",this.width=null,this.height=null}static get properties(){return{svg:{type:String},size:{type:String},width:{type:String},height:{type:String}}}static get styles(){return d`
+class Ie extends Le{}Ie.directiveName="unsafeSVG",Ie.resultType=2;const Ee=_e(Ie),Pe="important",De=" !"+Pe,Te=_e(class extends Ce{constructor(e){if(super(e),e.type!==Se||"style"!==e.name||e.strings?.length>2)throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.")}render(e){return Object.keys(e).reduce(((t,i)=>{const o=e[i];return null==o?t:t+`${i=i.includes("-")?i:i.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g,"-$&").toLowerCase()}:${o};`}),"")}update(e,[t]){const{style:i}=e.element;if(void 0===this.ft)return this.ft=new Set(Object.keys(t)),this.render(t);for(const e of this.ft)null==t[e]&&(this.ft.delete(e),e.includes("-")?i.removeProperty(e):i[e]=null);for(const e in t){const o=t[e];if(null!=o){this.ft.add(e);const t="string"==typeof o&&o.endsWith(De);e.includes("-")||t?i.setProperty(e,t?o.slice(0,-11):o,t?Pe:""):i[e]=o}}return Q}});var Fe,Re=__webpack_require__(989);const Me="./w/api",Ue="./w",Oe=c(Re.A);function Be(e){return[Oe,e]}const Ne=window.IS_APP||(null===(Fe=window.electron)||void 0===Fe?void 0:Fe.IS_APP)||window.matchMedia("(display-mode: standalone)").matches,je="2.2.2";function qe(e){" "==e.key&&(e.preventDefault(),e.target.click())}function He(e){const t=document.querySelector("head"),i=document.querySelectorAll("link[rel*='icon']");for(const e of i)t.removeChild(e);for(const i of e.icons){const e=document.createElement("link");e.rel=i.rel,e.href=i.href,t.appendChild(e)}}class We extends fe{constructor(){super(),this.size="1.1em",this.width=null,this.height=null}static get properties(){return{svg:{type:String},size:{type:String},width:{type:String},height:{type:String}}}static get styles(){return d`
       :host {
         display: inline-block;
         padding: 0;
@@ -1559,13 +1559,11 @@ function*(e,t){if(void 0!==e){let i=0;for(const o of e)yield t(o,i++)}}(e.resour
     `}renderItemInfo(e){return Y`<wr-item-info .item=${e}></wr-item-info>`}renderEmpty(){return Y`
       <p>
         Don't have any web archives yet? Check out
-        <a
-          href="https://chrome.google.com/webstore/detail/webrecorder-archivewebpag/fpeoodllldobpkbkabpblcfaogecpndd"
-          target="_blank"
+        <a href="https://webrecorder.net/archivewebpage" target="_blank"
           >ArchiveWeb.page</a
         >
         to save pages as you browse the web, or
-        <a href="https://browsertrix.com" target="_blank"
+        <a href="https://webrecorder.net/browsertrix" target="_blank"
           >sign up for Browsertrix</a
         >
         to archive entire websites with automated crawling!
