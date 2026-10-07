@@ -71,7 +71,7 @@ Must be embedded in a cross-origin `<iframe>`, preferably on the same parent dom
 #### Query parameters
 | Name | Required ? | Description |
 | --- | --- | --- |
-| `source` | Yes | Filename of the `.warc`, `.warc.gz` or `.wacz`. Can contain a path, but cannot be a url. <br>The file must either be present in the [`/archives/` folder](/html/archives/) or on the remote server defined in `nginx.conf`. |
+| `source` | Yes | Filename of the `.warc`, `.warc.gz` or `.wacz`, or an `https:` URL. <br>A filename can contain a path; the file must either be present in the [`/archives/` folder](/html/archives/) or on the remote server defined in `nginx.conf`. <br>A URL is read directly by the browser, so its server must allow CORS and range requests, and its origin must be allowed by the `connect-src` of the player's Content-Security-Policy (see [Static hosting](#static-hosting)). |
 | `url` | No | Url of a page within the archive to display. | 
 | `ts`| No | Timestamp of the page to retrieve. Can be either a YYYYMMDDHHMMSS-formatted string or a millisecond timestamp or a. |
 | `embed` | No | `<replay-web-page>`'s [embed mode](https://replayweb.page/docs/embedding). Can be set to `replayonly` to hide its UI. |
@@ -109,6 +109,17 @@ The following example describes the process of deploying `wacz-exhibitor` on [fl
 3. Initialize and deploy the project by running the `flyctl launch` command _(use `flyctl deploy` for subsequent deploys)_. 
 4. `wacz-exhibitor` is now live and visible on the [`fly.io` dashboard](https://fly.io/dashboard). 
 5. We highly recommend setting up a **custom domain and SSL certificate**. This can be done directly from the `fly.io` dashboard. Ideally, the target domain should be a subdomain of the website on which `wacz-exhibitor` iframes are going to be embedded: for example, `www.domain.ext` embedding an `<iframe>` from `wacz.domain.ext`.
+
+### Static hosting
+The player is static files, so it can also be served without NGINX when browsers read archives directly from their own server, passed to `source` as `https:` URLs. [`.github/workflows/pages.yml`](/.github/workflows/pages.yml) publishes it this way to GitHub Pages: `html/embed` at the site root beside `html/replay-web-page`.
+
+The host must send a `Content-Security-Policy` header on every file, like the one in `nginx.conf`, with a `connect-src` listing the archive origins:
+
+```
+default-src 'self' data: 'unsafe-inline' 'unsafe-hashes' 'unsafe-eval'; connect-src 'self' data: https://my-archives.s3.amazonaws.com
+```
+
+That header is the allowlist. Archived pages run scripts on the player's origin, and the replay frame at `/replay-web-page/` accepts a `source` of its own, so without it anyone could link to the player showing an archive of their choosing. GitHub Pages cannot send headers, so put a proxy such as Cloudflare in front of it and add the header there.
 
 [☝️ Back to summary](#summary)
 

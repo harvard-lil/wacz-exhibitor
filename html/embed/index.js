@@ -24,7 +24,7 @@ if (params.get("source") === null) {
 //------------------------------------------------------------------------------
 // Prepare and inject `<replay-web-page>`
 //------------------------------------------------------------------------------
-player.setAttribute("source", `/${params.get("source")}`);
+player.setAttribute("source", resolveSource(params.get("source")));
 player.setAttribute("replayBase", "/replay-web-page/");
 player.setAttribute("embed", "default");
 player.setAttribute("requireSubDomainIframe", "");
@@ -154,6 +154,38 @@ window.addEventListener("message", (event) => {
 //------------------------------------------------------------------------------
 // Utils
 //------------------------------------------------------------------------------
+/**
+ * Turns the `source` search param into the archive URL given to `<replay-web-page>`.
+ *
+ * A path is served from this origin. An absolute URL must be `https:` and carry
+ * no credentials. Which origins may actually be read is decided by the
+ * `connect-src` of the Content-Security-Policy this player is served with: the
+ * replay frame accepts a `source` of its own, so a check here alone could be
+ * bypassed.
+ *
+ * @param {string} source
+ * @returns {string}
+ */
+function resolveSource(source) {
+  const hasScheme = /^[a-z][a-z\d+.-]*:/i.test(source);
+
+  if (!hasScheme) {
+    const path = `/${source}`;
+    // A source starting with "/" or "\" would make a network-path reference
+    // ("//host/..."), which browsers resolve against another host.
+    if (new URL(path, window.location.href).origin !== window.location.origin) {
+      throw new Error("`source` must be a path on this origin or an https URL.");
+    }
+    return path;
+  }
+
+  const url = new URL(source);
+  if (url.protocol !== "https:" || url.username || url.password) {
+    throw new Error("`source` must be a path on this origin or an https URL.");
+  }
+  return url.href;
+}
+
 /**
  * Converts `ts` from timestamp to YYYYMMDDHHMMSS if necessary.
  * In `<replay-web-page>`, `ts` can be either depending on context, which can lead to confusions.

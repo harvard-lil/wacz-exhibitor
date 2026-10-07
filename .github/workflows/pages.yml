@@ -1,0 +1,55 @@
+# Publishes the player as a static site: html/embed at the root, beside
+# html/replay-web-page, matching the paths nginx.conf serves.
+#
+# The site's Content-Security-Policy is not set here, because GitHub Pages
+# cannot send response headers. Whatever fronts the site must add it, and its
+# connect-src is what decides which archive origins the player may read. LIL's
+# deployment at wacz-exhibitor.lil.tools gets it from a Cloudflare rule in
+# lil-terraform/wacz-exhibitor/static.
+name: Publish player to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # LIL's deployment; forks publish their own way if they want one.
+    if: github.repository == 'harvard-lil/wacz-exhibitor'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Assemble site
+        run: |
+          mkdir -p site
+          cp -R html/embed/. site/
+          cp -R html/replay-web-page site/replay-web-page
+          rm -f site/replay-web-page/.keep
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
