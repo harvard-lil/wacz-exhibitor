@@ -121,7 +121,7 @@ The host must also send a `Content-Security-Policy` header on every file, like t
 default-src 'self' data: 'unsafe-inline' 'unsafe-hashes' 'unsafe-eval'; connect-src 'self' data: https://my-archives.s3.amazonaws.com
 ```
 
-That header is the allowlist. Archived pages run scripts on the player's origin, and the replay frame at `/replay-web-page/` accepts a `source` of its own, so without it anyone could link to the player showing an archive of their choosing. GitHub Pages cannot send headers, so put a proxy such as Cloudflare in front of it and add the header there.
+That header is the allowlist, and nothing else enforces one: without it, static hosting fails open. Archived pages run scripts on the player's origin, and the replay frame at `/replay-web-page/` accepts a `source` of its own, which ReplayWeb's service worker fetches. A check in page scripts or a `<meta>` CSP does not reach the service worker, so anyone could link to the player running an archive of their choosing. GitHub Pages cannot send headers, so put a proxy such as Cloudflare in front of it, add the header there, and make sure the proxy is in place before the files are first published.
 
 [☝️ Back to summary](#summary)
 
