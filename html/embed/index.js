@@ -1,3 +1,5 @@
+import { relativeSourceOrigins } from "./config.js";
+
 //------------------------------------------------------------------------------
 // Type definitions
 //------------------------------------------------------------------------------
@@ -157,7 +159,8 @@ window.addEventListener("message", (event) => {
 /**
  * Turns the `source` search param into the archive URL given to `<replay-web-page>`.
  *
- * A path is served from this origin. An absolute URL must be `https:` and carry
+ * A path is read from this origin, or from the origin `relativeSourceOrigins`
+ * (config.js) gives for its ending. An absolute URL must be `https:` and carry
  * no credentials. Which origins may actually be read is decided by the
  * `connect-src` of the Content-Security-Policy this player is served with: the
  * replay frame accepts a `source` of its own, so a check here alone could be
@@ -176,7 +179,9 @@ function resolveSource(source) {
     if (new URL(path, window.location.href).origin !== window.location.origin) {
       throw new Error("`source` must be a path on this origin or an https URL.");
     }
-    return path;
+    const pathname = path.split(/[?#]/)[0];
+    const match = relativeSourceOrigins.find(([suffix]) => pathname.endsWith(suffix));
+    return match ? `${new URL(match[1]).origin}${path}` : path;
   }
 
   const url = new URL(source);

@@ -71,7 +71,7 @@ Must be embedded in a cross-origin `<iframe>`, preferably on the same parent dom
 #### Query parameters
 | Name | Required ? | Description |
 | --- | --- | --- |
-| `source` | Yes | Filename of the `.warc`, `.warc.gz` or `.wacz`, or an `https:` URL. <br>A filename can contain a path; the file must either be present in the [`/archives/` folder](/html/archives/) or on the remote server defined in `nginx.conf`. <br>A URL is read directly by the browser, so its server must allow CORS and range requests, and its origin must be allowed by the `connect-src` of the player's Content-Security-Policy (see [Static hosting](#static-hosting)). |
+| `source` | Yes | Filename of the `.warc`, `.warc.gz` or `.wacz`, or an `https:` URL. <br>A filename can contain a path; the file must either be present in the [`/archives/` folder](/html/archives/) or on the remote server defined in `nginx.conf` (or, for static hosting, `html/embed/config.js`). <br>A URL is read directly by the browser, so its server must allow CORS and range requests, and its origin must be allowed by the `connect-src` of the player's Content-Security-Policy (see [Static hosting](#static-hosting)). |
 | `url` | No | Url of a page within the archive to display. | 
 | `ts`| No | Timestamp of the page to retrieve. Can be either a YYYYMMDDHHMMSS-formatted string or a millisecond timestamp or a. |
 | `embed` | No | `<replay-web-page>`'s [embed mode](https://replayweb.page/docs/embedding). Can be set to `replayonly` to hide its UI. |
@@ -112,6 +112,8 @@ The following example describes the process of deploying `wacz-exhibitor` on [fl
 
 ### Static hosting
 The player is static files, so it can also be served without NGINX when browsers read archives directly from their own server, passed to `source` as `https:` URLs. [`.github/workflows/pages.yml`](/.github/workflows/pages.yml) publishes it this way to Cloudflare Pages: `html/embed` at the site root beside `html/replay-web-page`, plus a `_headers` file carrying the Content-Security-Policy described below.
+
+A relative `source` normally reads from the player's own origin. Without the NGINX proxy, [`html/embed/config.js`](/html/embed/config.js) can instead send it to an archive server by the end of its path, as the proxy does: with `[[".wacz", "https://my-waczs.s3.amazonaws.com"]]`, `source=dir/a.wacz?sig=…` is read from `https://my-waczs.s3.amazonaws.com/dir/a.wacz?sig=…`. An embedding site written for the proxy can then switch to static hosting without changing its `source` values. The workflow writes this from an environment variable for each deployment.
 
 The host must serve `index.html` for the directory paths `/` and `/replay-web-page/`. GitHub Pages, Cloudflare Pages and S3 website endpoints do; an S3 REST endpoint behind a CDN needs a rewrite rule. Without `/replay-web-page/index.html`, a first visit can get stuck on a blank frame (see `nginx.conf`). Other unknown paths must return 404, as NGINX does, not a single-page-app fallback page: Cloudflare Pages needs a top-level `404.html` for that.
 

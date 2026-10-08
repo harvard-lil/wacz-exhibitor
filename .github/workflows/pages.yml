@@ -1,15 +1,22 @@
-# Publishes the player as a static site to Cloudflare Pages: html/embed at the
+# Publishes the player as static sites on Cloudflare Pages: html/embed at the
 # root, beside html/replay-web-page, matching the paths nginx.conf serves.
 #
-# The site's Content-Security-Policy is written to a _headers file in the
-# build, so it reaches every hostname the Pages project serves. Its connect-src
-# lists the archive origins the player may read, taken from the repository
-# variable PLAYER_ARCHIVE_ORIGINS (space-separated). Without that header the
-# player would play any archive linked to it, so the build fails if the
-# variable is unset.
+# Each deployment is a GitHub environment of the same name, holding:
 #
-# The Pages project, its custom domain (wacz-exhibitor.lil.tools) and DNS are
-# managed in lil-terraform/wacz-exhibitor/static.
+#   PAGES_PROJECT                   Cloudflare Pages project to upload to.
+#   PLAYER_ARCHIVE_ORIGINS          Space-separated origins the player may read
+#                                   archives from. They become the connect-src
+#                                   of the Content-Security-Policy written to
+#                                   _headers, which reaches every hostname the
+#                                   project serves. Without that header the
+#                                   player would play any archive linked to it,
+#                                   so the build fails if this is unset.
+#   PLAYER_RELATIVE_SOURCE_ORIGINS  Optional JSON written to config.js as
+#                                   relativeSourceOrigins, e.g.
+#                                   [[".wacz", "https://my-waczs.s3.amazonaws.com"]].
+#                                   Each origin must be in PLAYER_ARCHIVE_ORIGINS.
+#
+# The Pages projects, custom domains and DNS are managed in lil-terraform.
 name: Publish player to Cloudflare Pages
 
 on:
@@ -20,18 +27,23 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
 jobs:
   deploy:
-    # LIL's deployment; forks publish their own way if they want one.
+    # LIL's deployments; forks publish their own way if they want them.
     if: github.repository == 'harvard-lil/wacz-exhibitor'
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        deployment:
+          - wacz-exhibitor.lil.tools
+          - rejouer.perma-stage.org
+    concurrency:
+      group: pages-${{ matrix.deployment }}
+      cancel-in-progress: false
     environment:
-      name: cloudflare-pages
-      url: https://wacz-exhibitor.lil.tools
+      name: ${{ matrix.deployment }}
+      url: https://${{ matrix.deployment }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -40,9 +52,10 @@ jobs:
       - name: Assemble site
         env:
           ARCHIVE_ORIGINS: ${{ vars.PLAYER_ARCHIVE_ORIGINS }}
+          RELATIVE_SOURCE_ORIGINS: ${{ vars.PLAYER_RELATIVE_SOURCE_ORIGINS }}
         run: |
           set -euo pipefail
-          : "${ARCHIVE_ORIGINS:?Set the PLAYER_ARCHIVE_ORIGINS repository variable}"
+          : "${ARCHIVE_ORIGINS:?Set PLAYER_ARCHIVE_ORIGINS on the environment}"
           mkdir -p site
           cp -R html/embed/. site/
           cp -R html/replay-web-page site/replay-web-page
@@ -58,10 +71,25 @@ jobs:
           } > site/_headers
           cat site/_headers
 
+          if [ -n "${RELATIVE_SOURCE_ORIGINS}" ]; then
+            # Every mapped origin has to be readable under the CSP, or relative
+            # sources would fail to load.
+            for origin in $(jq -r '.[][1]' <<<"${RELATIVE_SOURCE_ORIGINS}"); do
+              case " ${ARCHIVE_ORIGINS} " in
+                *" ${origin} "*) ;;
+                *) echo "::error::${origin} is not in PLAYER_ARCHIVE_ORIGINS"; exit 1 ;;
+              esac
+            done
+            ORIGINS_JSON="$(jq -c . <<<"${RELATIVE_SOURCE_ORIGINS}")" \
+              perl -pi -e 's/^export const relativeSourceOrigins = \[\];$/export const relativeSourceOrigins = $ENV{ORIGINS_JSON};/' site/config.js
+            grep -q '^export const relativeSourceOrigins = \[\[' site/config.js
+          fi
+          grep '^export const relativeSourceOrigins' site/config.js
+
       - name: Deploy to Cloudflare Pages
         uses: harvard-lil/lil-actions/cloudflare-pages-deploy@main
         with:
-          project-name: wacz-exhibitor
+          project-name: ${{ vars.PAGES_PROJECT }}
           directory: site
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
