@@ -1,15 +1,12 @@
-# Publishes the player as a static site to Cloudflare Pages: html/embed at the
-# root, beside html/replay-web-page, matching the paths nginx.conf serves.
+# Publishes the project's own deployment of the player, wacz-exhibitor.lil.tools
+# (used by museum.lil.tools and warcembed-demo.lil.tools), to Cloudflare Pages
+# whenever main changes. Other sites deploy the player themselves from a
+# release, with scripts/build-static.sh; Perma's Rejouer does this from Perma's
+# staging and prod workflows.
 #
-# The site's Content-Security-Policy is written to a _headers file in the
-# build, so it reaches every hostname the Pages project serves. Its connect-src
-# lists the archive origins the player may read, taken from the repository
-# variable PLAYER_ARCHIVE_ORIGINS (space-separated). Without that header the
-# player would play any archive linked to it, so the build fails if the
-# variable is unset.
-#
-# The Pages project, its custom domain (wacz-exhibitor.lil.tools) and DNS are
-# managed in lil-terraform/wacz-exhibitor/static.
+# The GitHub environment wacz-exhibitor.lil.tools holds PAGES_PROJECT and
+# PLAYER_ARCHIVE_ORIGINS (see scripts/build-static.sh). The Pages project, its
+# custom domain and DNS are in lil-terraform/wacz-exhibitor/static.
 name: Publish player to Cloudflare Pages
 
 on:
@@ -30,39 +27,25 @@ jobs:
     if: github.repository == 'harvard-lil/wacz-exhibitor'
     runs-on: ubuntu-latest
     environment:
-      name: cloudflare-pages
+      name: wacz-exhibitor.lil.tools
       url: https://wacz-exhibitor.lil.tools
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Assemble site
+      - name: Build site
         env:
           ARCHIVE_ORIGINS: ${{ vars.PLAYER_ARCHIVE_ORIGINS }}
-        run: |
-          set -euo pipefail
-          : "${ARCHIVE_ORIGINS:?Set the PLAYER_ARCHIVE_ORIGINS repository variable}"
-          mkdir -p site
-          cp -R html/embed/. site/
-          cp -R html/replay-web-page site/replay-web-page
-          rm -f site/replay-web-page/.keep
-          # Without a top-level 404.html, Pages answers unknown paths with
-          # index.html, as for a single-page app. ReplayWeb's API requests that
-          # arrive before its service worker is active must get a 404, as they
-          # do from NGINX, not an HTML page it tries to parse.
-          echo "Not found" > site/404.html
-          {
-            echo "/*"
-            echo "  Content-Security-Policy: default-src 'self' data: 'unsafe-inline' 'unsafe-hashes' 'unsafe-eval'; connect-src 'self' data: ${ARCHIVE_ORIGINS}"
-          } > site/_headers
-          cat site/_headers
+        run: scripts/build-static.sh site
 
       - name: Deploy to Cloudflare Pages
         uses: harvard-lil/lil-actions/cloudflare-pages-deploy@main
         with:
-          project-name: wacz-exhibitor
+          project-name: ${{ vars.PAGES_PROJECT }}
           directory: site
+          branch: main
+          skip-unchanged: "true"
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
