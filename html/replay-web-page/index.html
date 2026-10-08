@@ -1,0 +1,14 @@
+<!doctype html>
+<!--
+  The page ReplayWeb.page's service worker serves for /replay-web-page/ when
+  registered with serveIndex=1 (getIndexHtml in sw.js), copied so the server can
+  answer a frame the worker does not control yet. It must be served for
+  /replay-web-page/: static hosts do this as the directory index, and
+  nginx.conf maps it explicitly. See the comment there for the race it avoids.
+-->
+<html>
+<head><script src="./ui.js"></script></head>
+<body>
+<replay-app-main></replay-app-main>
+</body>
+</html>
