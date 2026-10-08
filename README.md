@@ -111,7 +111,7 @@ The following example describes the process of deploying `wacz-exhibitor` on [fl
 5. We highly recommend setting up a **custom domain and SSL certificate**. This can be done directly from the `fly.io` dashboard. Ideally, the target domain should be a subdomain of the website on which `wacz-exhibitor` iframes are going to be embedded: for example, `www.domain.ext` embedding an `<iframe>` from `wacz.domain.ext`.
 
 ### Static hosting
-The player is static files, so it can also be served without NGINX when browsers read archives directly from their own server, passed to `source` as `https:` URLs. [`.github/workflows/pages.yml`](/.github/workflows/pages.yml) publishes it this way to GitHub Pages: `html/embed` at the site root beside `html/replay-web-page`.
+The player is static files, so it can also be served without NGINX when browsers read archives directly from their own server, passed to `source` as `https:` URLs. [`.github/workflows/pages.yml`](/.github/workflows/pages.yml) publishes it this way to Cloudflare Pages: `html/embed` at the site root beside `html/replay-web-page`, plus a `_headers` file carrying the Content-Security-Policy described below.
 
 The host must serve `index.html` for the directory paths `/` and `/replay-web-page/`. GitHub Pages, Cloudflare Pages and S3 website endpoints do; an S3 REST endpoint behind a CDN needs a rewrite rule. Without `/replay-web-page/index.html`, a first visit can get stuck on a blank frame (see `nginx.conf`).
 
@@ -121,7 +121,7 @@ The host must also send a `Content-Security-Policy` header on every file, like t
 default-src 'self' data: 'unsafe-inline' 'unsafe-hashes' 'unsafe-eval'; connect-src 'self' data: https://my-archives.s3.amazonaws.com
 ```
 
-That header is the allowlist, and nothing else enforces one: without it, static hosting fails open. Archived pages run scripts on the player's origin, and the replay frame at `/replay-web-page/` accepts a `source` of its own, which ReplayWeb's service worker fetches. A check in page scripts or a `<meta>` CSP does not reach the service worker, so anyone could link to the player running an archive of their choosing. GitHub Pages cannot send headers, so put a proxy such as Cloudflare in front of it, add the header there, and make sure the proxy is in place before the files are first published.
+That header is the allowlist, and nothing else enforces one: without it, static hosting fails open. Archived pages run scripts on the player's origin, and the replay frame at `/replay-web-page/` accepts a `source` of its own, which ReplayWeb's service worker fetches. A check in page scripts or a `<meta>` CSP does not reach the service worker, so anyone could link to the player running an archive of their choosing. Prefer a host that serves the header with the files, such as a Cloudflare Pages or Netlify `_headers` file, so it reaches every hostname the site is served on. GitHub Pages cannot send headers at all.
 
 [☝️ Back to summary](#summary)
 
