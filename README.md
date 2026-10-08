@@ -113,7 +113,7 @@ The following example describes the process of deploying `wacz-exhibitor` on [fl
 ### Static hosting
 The player is static files, so it can also be served without NGINX when browsers read archives directly from their own server, passed to `source` as `https:` URLs. [`.github/workflows/pages.yml`](/.github/workflows/pages.yml) publishes it this way to Cloudflare Pages: `html/embed` at the site root beside `html/replay-web-page`, plus a `_headers` file carrying the Content-Security-Policy described below.
 
-The host must serve `index.html` for the directory paths `/` and `/replay-web-page/`. GitHub Pages, Cloudflare Pages and S3 website endpoints do; an S3 REST endpoint behind a CDN needs a rewrite rule. Without `/replay-web-page/index.html`, a first visit can get stuck on a blank frame (see `nginx.conf`).
+The host must serve `index.html` for the directory paths `/` and `/replay-web-page/`. GitHub Pages, Cloudflare Pages and S3 website endpoints do; an S3 REST endpoint behind a CDN needs a rewrite rule. Without `/replay-web-page/index.html`, a first visit can get stuck on a blank frame (see `nginx.conf`). Other unknown paths must return 404, as NGINX does, not a single-page-app fallback page: Cloudflare Pages needs a top-level `404.html` for that.
 
 The host must also send a `Content-Security-Policy` header on every file, like the one in `nginx.conf`, with a `connect-src` listing the archive origins:
 

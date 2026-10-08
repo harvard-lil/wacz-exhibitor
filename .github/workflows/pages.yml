@@ -47,6 +47,11 @@ jobs:
           cp -R html/embed/. site/
           cp -R html/replay-web-page site/replay-web-page
           rm -f site/replay-web-page/.keep
+          # Without a top-level 404.html, Pages answers unknown paths with
+          # index.html, as for a single-page app. ReplayWeb's API requests that
+          # arrive before its service worker is active must get a 404, as they
+          # do from NGINX, not an HTML page it tries to parse.
+          echo "Not found" > site/404.html
           {
             echo "/*"
             echo "  Content-Security-Policy: default-src 'self' data: 'unsafe-inline' 'unsafe-hashes' 'unsafe-eval'; connect-src 'self' data: ${ARCHIVE_ORIGINS}"
