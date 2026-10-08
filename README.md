@@ -115,13 +115,13 @@ The player is static files, so it can also be served without NGINX when browsers
 
 The host must serve `index.html` for the directory paths `/` and `/replay-web-page/`. GitHub Pages, Cloudflare Pages and S3 website endpoints do; an S3 REST endpoint behind a CDN needs a rewrite rule. Without `/replay-web-page/index.html`, a first visit can get stuck on a blank frame (see `nginx.conf`). Other unknown paths must return 404, as NGINX does, not a single-page-app fallback page: Cloudflare Pages needs a top-level `404.html` for that.
 
-The host must also send a `Content-Security-Policy` header on every file, like the one in `nginx.conf`, with a `connect-src` listing the archive origins:
+**Important:** Unless protected by a content security policy, hosting replayweb.page this way inherently allows cross-site scripting attacks. The host must send a `Content-Security-Policy` header on every file, like the one in `nginx.conf`, with a `connect-src` listing the archive origins:
 
 ```
 default-src 'self' data: 'unsafe-inline' 'unsafe-hashes' 'unsafe-eval'; connect-src 'self' data: https://my-archives.s3.amazonaws.com
 ```
 
-That header is the allowlist, and nothing else enforces one: without it, static hosting fails open. Archived pages run scripts on the player's origin, and the replay frame at `/replay-web-page/` accepts a `source` of its own, which ReplayWeb's service worker fetches. A check in page scripts or a `<meta>` CSP does not reach the service worker, so anyone could link to the player running an archive of their choosing. Prefer a host that serves the header with the files, such as a Cloudflare Pages or Netlify `_headers` file, so it reaches every hostname the site is served on. GitHub Pages cannot send headers at all.
+Nothing else can effectively enforce the allowlist; without it, static hosting fails open. Archived pages run scripts on the player's origin, and the replay frame at `/replay-web-page/` accepts a `source` of its own, which ReplayWeb's service worker fetches. A check in page scripts or a `<meta>` CSP does not reach the service worker, so anyone could link to the player running an archive of their choosing. Prefer a host that serves the header with the files, such as a Cloudflare Pages or Netlify `_headers` file, so it reaches every hostname the site is served on. GitHub Pages cannot send headers at all, so is not a good fit.
 
 [☝️ Back to summary](#summary)
 
