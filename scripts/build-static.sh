@@ -81,9 +81,18 @@ grep -q "src=\"/${build}/index.js\"" "$out/index.html"
 # not an HTML page it tries to parse.
 echo "Not found" > "$out/404.html"
 
+# index.html is the one file whose URL stays the same across builds, and it
+# names the current build's directory, which the next deployment may remove.
+# Browsers must check it every time rather than reuse a copy pointing at a
+# directory that is gone. no-cache, unlike a short max-age, is kept by
+# Cloudflare when a zone's Browser Cache TTL would otherwise lengthen it.
 {
   echo "/*"
   echo "  Content-Security-Policy: default-src 'self' data: 'unsafe-inline' 'unsafe-hashes' 'unsafe-eval'; connect-src 'self' data: ${ARCHIVE_ORIGINS}"
+  echo "/"
+  echo "  Cache-Control: no-cache"
+  echo "/index.html"
+  echo "  Cache-Control: no-cache"
 } > "$out/_headers"
 
 echo "build ${build}"
