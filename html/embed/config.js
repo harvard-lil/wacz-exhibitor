@@ -22,3 +22,16 @@
  * @type {Array<[string, string]>}
  */
 export const relativeSourceOrigins = [];
+
+/**
+ * Path the ReplayWeb.page files (ui.js, sw.js, index.html) are served under,
+ * which is also the service worker's scope.
+ *
+ * scripts/build-static.sh moves them, with index.js and this file, into a
+ * directory named for each build, so that browsers holding an earlier build's
+ * files from their HTTP cache, or a service worker registered for its scope,
+ * cannot mix them with a new one.
+ *
+ * @type {string}
+ */
+export const replayBase = "/replay-web-page/";

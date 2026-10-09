@@ -1,4 +1,4 @@
-import { relativeSourceOrigins } from "./config.js";
+import { relativeSourceOrigins, replayBase } from "./config.js";
 
 //------------------------------------------------------------------------------
 // Type definitions
@@ -27,7 +27,7 @@ if (params.get("source") === null) {
 // Prepare and inject `<replay-web-page>`
 //------------------------------------------------------------------------------
 player.setAttribute("source", resolveSource(params.get("source")));
-player.setAttribute("replayBase", "/replay-web-page/");
+player.setAttribute("replayBase", replayBase);
 player.setAttribute("embed", "default");
 player.setAttribute("requireSubDomainIframe", "");
 
